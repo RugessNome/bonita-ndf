@@ -1,0 +1,1815 @@
+<html>
+	<head>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+		<title>Processus de Gestion des Notes de Frais</title>
+		<style>
+body {
+	max-width: 7in;
+}
+
+.titre-document {
+	text-align: center;
+	margin-top: 2in;
+	margin-bottom: 2in;
+}
+
+.box {
+	border: 1px solid black;
+	padding-left: 32px;
+	padding-right: 32px;
+}
+
+.page {
+	height: 11in;
+}
+
+nav ol {
+	list-style-type: none;
+}
+
+nav .marker
+{
+	display: inline-block;
+	width: 3em;
+}
+
+
+.bdm-object {
+	margin: auto;
+    border-collapse: collapse;
+	border: 1px solid black;
+}
+
+.bdm-object td {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	text-align: center;
+}
+
+.bdm-object .entete td {
+	font-weight: bold;
+    border-bottom: 1px solid black;
+}
+
+
+.contrat {
+	margin: auto;
+    border-collapse: collapse;
+	border: 1px solid black;
+}
+
+.contrat .indentation {
+    margin-left: 2em;
+}
+
+.contrat td {
+	padding-left: 2em;
+	padding-right: 2em;
+}
+
+.contrat .entete td {
+	font-weight: bold;
+	text-align: center;
+    border-bottom: 1px solid black;
+}
+
+header {
+	margin-top: 2em;
+	margin-bottom: 1em;
+}
+
+
+header h1,h2,h3,h4 {
+	display: inline;
+	font-weight: bold;
+}
+
+header .num-section {
+	margin-right: 1em;
+}
+
+section img {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+.inline-code {
+	font-family: Courier new;
+	background-color: yellow;
+}
+
+.code {
+	margin: 1em;
+	padding-left: 1em;
+	border: 2px dashed green;
+	overflow-x: auto;
+}
+
+
+/* volet déroulant*/
+.variable-formulaire {
+	border: 2px solid grey;
+	border-radius: 2px;
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+.variable-formulaire .nom, .description, label{
+	padding-left: 1em;
+}
+.variable-formulaire .nom, .description{
+	border-bottom: 1px solid grey;
+}
+.variable-formulaire .nom{
+	font-weight: bold;
+}
+.variable-formulaire input {
+	display: none;
+}
+input ~ .code {
+	display: none;
+	border: none;
+	border-top: 1px solid grey;
+    margin: 0;
+	padding: 1em;
+}
+input:checked ~ .code {
+	display: block;
+}
+		</style>
+	</head>
+<body>
+
+<div class="page">
+<header>
+		<h4 class="auteur">vincent.chambrin</h1><span style="float:right"><h4>[rev.1]</h4></span>
+</header>
+
+<div class="titre-document">
+<h1>Processus de Gestion des Notes de Frais</h1>
+<h2>Bonita BPM 7.1.5</h2>
+</div>
+
+<div class="box">
+<p>
+Ce document fournit une description détaillée de l'implémentation dans Bonita BPM 7.1.5 
+du processus de gestion des notes de frais ainsi que des applications associées. <br/>
+Il contient en outre une partie relative à l'intégration du processus dans l'ensemble 
+des processus de Wise IT.
+</p>
+</div>
+
+</div>
+
+
+<nav>
+	<h1>Table des matières</h1>
+	<ol>
+		<li>
+			<span class="marker">1</span><a href="#intro">Introduction</a>
+		</li>
+		<li>
+			<span class="marker">2</span><a href="#bdm"><i>Business Data Model</i></a>
+			<ol>
+				<li>
+					<span class="marker">2.1</span><a href="#bdm.presentation">Présentation</a>
+				</li>
+				<li>
+					<span class="marker">2.2</span><a href="#bdm.elem">Objet métier <i>ElementNoteDeFrais</i></a>
+				</li>
+				<li>
+					<span class="marker">2.3</span><a href="#bdm.note">Objet métier <i>NoteDeFrais</i></a>
+				</li>
+			</ol>
+		</li>
+		<li>
+			<span class="marker">2</span><a href="#asset">Asset Javascript</a>
+		</li>
+		<li>
+			<span class="marker">3</span><a href="#proc">Processus</a>
+			<ol>
+				<li>
+					<span class="marker">3.1</span><a href="#proc.presentation">Présentation du processus</a>
+				</li>
+				<li>
+					<span class="marker">3.2</span><a href="#proc.acteurs">Acteurs</a>
+				</li>
+				<li>
+					<span class="marker">3.3</span><a href="#proc.variables">Variables et documents</a>
+				</li>
+				<li>
+					<span class="marker">3.4</span><a href="#proc.activites">Activités</a>
+					<ol>
+						<li>
+							<span class="marker">3.4.1</span><a href="#proc.activites.creer">Créer une note de frais</a>
+							<ol>
+								<li>
+								<span class="marker">3.4.1.1</span><a href="#proc.activites.creer.contrat">Contrat</a>
+								</li>
+								<li>
+								<span class="marker">3.4.1.2</span><a href="#proc.activites.creer.formulaire">Formulaire</a>
+								</li>
+								<li>
+								<span class="marker">3.4.1.3</span><a href="#proc.activites.creer.init">Initialisations</a>
+								</li>
+							</ol>
+						</li>
+						<li>
+							<span class="marker">3.4.2</span><a href="#proc.activites.completer">Compléter une note de frais</a>
+							<ol>
+								<li>
+								<span class="marker">3.4.2.1</span><a href="#proc.activites.completer.contrat">Contrat</a>
+								</li>
+								<li>
+								<span class="marker">3.4.2.2</span><a href="#proc.activites.completer.formulaire">Formulaire</a>
+								</li>
+								<li>
+								<span class="marker">3.4.2.3</span><a href="#proc.activites.completer.operations">Opérations</a>
+								</li>
+							</ol>
+						</li>
+						<li>
+							<span class="marker">3.4.3</span><a href="#proc.activites.valider">Valider une note de frais</a>
+							<ol>
+								<li>
+								<span class="marker">3.4.3.1</span><a href="#proc.activites.valider.contrat">Contrat</a>
+								</li>
+								<li>
+								<span class="marker">3.4.3.2</span><a href="#proc.activites.valider.formulaire">Formulaire</a>
+								</li>
+								<li>
+								<span class="marker">3.4.3.3</span><a href="#proc.activites.valider.operations">Opérations</a>
+								</li>
+							</ol>
+						</li>
+						<li>
+							<span class="marker">3.3.4</span><a href="#proc.activites.terminer">Terminer le processus</a>
+						</li>
+					</ol>
+				</li>
+			</ol>
+		</li>
+		<li>
+			<span class="marker">4</span><a href="#apps">Applications</a>
+			<ol>
+				<li>
+				<span class="marker">4.1</span><a href="#apps.notes">Mes notes de frais</a>
+				</li>
+				<li>
+				<span class="marker">4.2</span><a href="#apps.gestion">Gestion des notes de frais</a>
+				</li>
+			</ol>
+		</li>
+		<li>
+			<span class="marker">5</span><a href="#integration">Intégration</a>
+		</li>
+	</ol>
+</nav>
+
+<section id="intro">
+	<header>
+		<h1 class="num-section">1</h1><h1>Introduction</h1><span style="float:right"><a href="#intro"><h1>[intro]</h1></a></span>
+	</header>
+	
+	<p>
+	Ce document se décompose en plusieurs parties. Dans un premier temps, le modèle de données métier 
+	(<i>Business Data Model</i>) est présenté. Il servira ensuite à construire le processus et les 
+	différentes applications. Après une présentation du processus dans son ensemble, les différentes 
+	activités sont décrites. Les contrats, formulaires et opérations à effectuer sont brièvement présentés 
+	pour chaque activité. <br/>
+	Enfin, deux applications sont proposés pour compléter le processus. <br/>
+	La dernière section concerne le déploiement du processus.
+	</p>
+	
+</section>
+
+<section id="bdm">
+	<header>
+		<h1 class="num-section">2</h1><h1><i>Business Data Model</i></h1><span style="float:right"><a href="#bdm"><h1>[bdm]</h1></a></span>
+	</header>
+	
+	<section id="bdm.presentation">
+		<header>
+			<h2 class="num-section">2.1</h2><h2>Presentation</h2><span style="float:right"><a href="#bdm.presentation"><h2>[bdm.presentation]</h2></a></span>
+		</header>
+
+		<p>
+		Cette section décrit les objets métiers utlisés lors du processus de déclaration d'une note de 
+		frais. Les objets métiers décrit sont <i>ElementNoteDeFrais</i> et <i>NoteDeFrais</i>. Le premier 
+		correspond à un élément d'une note de frais et contient notamment le montant de la dépense, le 
+		second correspond à la note de frais en elle-même et contient l'ensemble des éléments de la note 
+		de frais ainsi que le mois comptable de la note de frais. <br/>
+		</p>
+		
+		<p>
+		La convention <a href="https://fr.wikipedia.org/wiki/CamelCase">CamelCase</a> est utilisé pour les 
+		objets métiers pour rester cohérent avec les conventions utilisés en Java. <br/>
+		Dans les autres cas, si possible, les noms sont écrits en miniscule avec un underscore comme séparateur.
+		</p>
+		
+	</section>
+	
+	<section id="bdm.elem">
+		<header>
+			<h2 class="num-section">2.2</h2><h2>Objet métier <i>ElementNoteDeFrais</i></h2><span style="float:right"><a href="#bdm.elem"><h2>[bdm.elem]</h2></a></span>
+		</header>
+	
+		<p>
+		Le tableau suivant décrit l'objet métier <i>ElementNoteDeFrais</i> représentant un élément 
+		d'une note de frais.
+		</p>
+	
+		<table class="bdm-object">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Obligatoire</td>
+					<td>Note</td>
+				</tr>
+				<tr>
+					<td>type</td>
+					<td>STRING</td>
+					<td>Oui</td>
+					<td>Longueur : 32</td>
+				</tr>
+				<tr>
+					<td>montant</td>
+					<td>DOUBLE</td>
+					<td>Oui</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>dateDepense</td>
+					<td>DATE</td>
+					<td>Oui</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>justificatif</td>
+					<td>STRING</td>
+					<td>Non</td>
+					<td>Longueur : 255</td>
+				</tr>
+				<tr>
+					<td>affaire</td>
+					<td>STRING</td>
+					<td>Oui</td>
+					<td>Longueur : 127</td>
+				</tr>
+				<tr>
+					<td>distance</td>
+					<td>DOUBLE</td>
+					<td>Non</td>
+					<td>utilisé pour le type "KMS"</td>
+				</tr>
+				<tr>
+					<td>coutKm</td>
+					<td>DOUBLE</td>
+					<td>Non</td>
+					<td>utilisé pour le type "KMS"</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<p>
+		<i>Remarque </i>: La colonne <i>Multiple</i> de <i>Bonita</i> n'est pas précisé ici car tous les 
+		il vaut <i>false</i> pour tous les éléments.
+		</p>
+		
+		<p>
+		Le champ <i>type</i> représente le type de la dépense. Sa valeur doit être parmi :
+		</p>
+		<ul>
+			<li>Hotel</li>
+			<li>Repas</li>
+			<li>Parking</li>
+			<li>Taxi</li>
+			<li>Péage</li>
+			<li>Métro-Bus</li>
+			<li>Train</li>
+			<li>Avion</li>
+			<li>KMS</li>
+			<li>Divers</li>
+		</ul>
+		
+		<p>
+		<i>Remarque </i>: Le type <i>KMS</i> est un type particulier représentant un déplacement en voiture.
+		</p>
+		
+		<p>
+		Le champ <i>montant</i> indique le montant de la dépense en euros et le champ <i>dateDepense</i> 
+		la date à laquelle la dépense a été effectuée.
+		</p>
+		
+		<p>
+		Le champ <i>affaire</i> contient l'identifiant de l'affaire assoicée à la dépense.
+		</p>
+		
+		<p>
+		Le champ <i>justificatif</i> donne une indication sur la pièce jointe contenant la preuve 
+		de la dépense.
+		</p>
+		
+		<p>
+		<i>Remarque </i>: On aurait pu donner au champ <i>numeroJustificatif</i> le type <i>INTEGER</i> 
+		mais cela aurait été réducteur. Le type <i>STRING</i> permettra de donner des indications 
+		beaucoup plus large comme "Pièce-jointe 1 page 2" tout en permettant toujours de donner un simple 
+		numéro.
+		</p>
+		
+		<p>
+		Les champs <i>distance</i> et <i>coutKm</i> sont utilisés dans le cas ou le type de dépense vaut 
+		"KMS". Ils servent à stocker la distance parcourue et le coût du déplacement au kilomètre. <br/>
+		On peut ensuite se servir de ces informations pour calculer le coût total et le stocker dans le 
+		champ <i>montant</i>.
+		</p>
+		
+	</section>
+	
+	<section id="bdm.note">
+		<header>
+			<h2 class="num-section">2.3</h2><h2>Objet métier <i>NoteDeFrais</i></h2><span style="float:right"><a href="#bdm.note"><h2>[bdm.note]</h2></a></span>
+		</header>
+		
+		<p>
+		Le tableau suivant décrit l'objet métier <i>NoteDeFrais</i> représentant une note de frais.
+		</p>
+	
+		<table class="bdm-object">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Multiple</td>
+					<td>Obligatoire</td>
+					<td>Note</td>
+				</tr>
+				<tr>
+					<td>utilisateur</td>
+					<td>LONG</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td>identifiant Bonita</td>
+				</tr>
+				<tr>
+					<td>moisComptable</td>
+					<td>STRING</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td>Longueur : 32</td>
+				</tr>
+				<tr>
+					<td>anneeComptable</td>
+					<td>INTEGER</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>elements</td>
+					<td>ElementNoteDeFrais</td>
+					<td>Oui</td>
+					<td>Non</td>
+					<td>Cocher "Toujours charger les objets liés"</td>
+				</tr>
+				<tr>
+					<td>commentaires</td>
+					<td>TEXT</td>
+					<td>Non</td>
+					<td>Non</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>commentairesValidateur</td>
+					<td>TEXT</td>
+					<td>Non</td>
+					<td>Non</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>estComplete</td>
+					<td>BOOLEAN</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>estValidee</td>
+					<td>BOOLEAN</td>
+					<td>Non</td>
+					<td>Non</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>dateCreation</td>
+					<td>DATE</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>dateValidation</td>
+					<td>DATE</td>
+					<td>Non</td>
+					<td>Non</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>cas</td>
+					<td>LONG</td>
+					<td>Non</td>
+					<td>Oui</td>
+					<td>cas associé à la note ; identifiant Bonita</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<p>
+		Le champ <i>utilisateur</i> représente l'identifiant de l'utilisateur ayant créer la note de frais.
+		</p>
+		
+		<p>
+		Les champs <i>moisComptable</i> et <i>anneeComptable</i> servent à identifier le mois comptable 
+		pour la note de frais. Un utilisateur donné ne peut créer qu'une seule note de frais pour un mois 
+		comptable donné.
+		</p>
+		
+		<p>
+		<i>Remarque</i>: On aurait également pu utiliser un entier pour stocker le mois comptable mais 
+		cela implique ensuite de convertir cet entier en une chaîne de caractère pour l'affichage.
+		</p>
+
+		<p>
+		Les champs <i>commentaires</i> et <i>commentairesValidateur</i> sont utilisés pour les 
+		commentaires de l'utilisateur déclarant sa note de frais et pour le validateur.
+		</p>
+		
+		<p>
+		Les champs <i>estComplete</i> et <i>estValidee</i> permettent de savoir si la note de frais est 
+		complète et si elle a été validée.
+		</p>
+		
+		<p>
+		La date de création de la note de frais et sa date de validation sont stockées dans les champs 
+		<i>dateCreation</i> et <i>dateValidation</i>.
+		</p>
+		
+		<p>
+		Les différents éléments de la note de frais son stockés dans le champ <i>elements</i>.
+		</p>
+		
+		<p>
+		<i>Remarque</i>: il est important pour le champ <i>elements</i> de cocher la case 
+		<i>Toujours charger les objets liés</i> pour éviter d'avoir à faire le chargement manuellement 
+		dans le UI-Designer.
+		</p>		
+
+	</section>
+	
+</section>
+
+<section id="asset">
+	<header>
+		<h1 class="num-section">2</h1><h1>Asset Javascript</h1><span style="float:right"><a href="#asset"><h1>[asset]</h1></a></span>
+	</header>
+	
+	<p>
+	Les formulaires et pages créés utilisent un asset Javascript permettant d'accéder plus facilement 
+	à l'API Rest et de limiter le nombre de variable à créer dans chaque formulaire.
+	</p>
+	
+	<p>
+	Le code source de cet asset est fournit ci-après:
+	</p>
+	
+	<div class="code">
+	<pre>
+
+function RestApiObject() {
+
+	this.cache = new Map();
+
+	// fait appel à l'API Rest en executant une requete GET sur l'url
+	this.get = function(url) {
+		if(this.cache.has(url)) {
+			return this.cache.get(url);
+		}
+	
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, false);
+		xhr.send(null);
+		if(xhr.status == 200) {
+			var result = JSON.parse(xhr.responseText);
+			this.cache.set(url, result);
+			return result;
+		}
+		return null;
+	}
+}
+
+var RestApi = new RestApiObject();
+
+function IdentityObject() {
+	this.user_cache = [];
+	
+	this.clearCache = function() {
+		this.user_cache = [];
+	}
+	
+	// renvoie l'objet representant l'utilisateur avec l'id user_id
+	// les resultats sont mis en cache
+	this.getUser = function(user_id) {
+		var user_index = user_id;
+		if(typeof user_index != "number") {
+			user_index = parseInt(user_id);
+		}
+		if(user_index &lt; 0)
+		{
+			return {};
+		}
+		if(this.user_cache.length > user_index)
+		{
+			if(this.user_cache[user_index] != null)
+			{
+				return this.user_cache[user_index];
+			}
+		}
+	
+		var user = RestApi.get("../API/identity/user/" + user_id);
+		this.user_cache[user_index] = user;
+		return user;
+	}
+	
+	// renvoie l'objet representant l'utilisateur courant
+	this.getCurrentUser = function() {
+		return RestApi.get("../API/system/session/unusedid");
+	}
+	
+	this.getCurrentUserId = function() {
+		var current_user = this.getCurrentUser();
+		if(current_user != null) {
+			return current_user.user_id;
+		}
+		return null;
+	}
+}
+
+RestApi.Identity = new IdentityObject();
+
+
+function BpmObject() {
+	
+	// renvoie la liste des documents associés à un cas 
+	// fonction pas encore suffisament testée
+	this.getCaseDocuments = function(case_id) {
+		var docs = RestApi.get(
+		"../API/bpm/archivedCaseDocument?p=0&amp;c=25" 
+		+ "&amp;f=caseId=" + case_id);
+		if(docs === null || docs.length == 0) {
+			docs = RestApi.get(
+			"../API/bpm/archivedCaseDocument?p=0&amp;c=25&amp;" 
+			+ "f=archivedCaseId=" + case_id);
+		}
+		return docs;
+	}
+}
+
+RestApi.Bpm = new BpmObject();
+
+
+function BdmObject() {
+	
+	// renvoie true si il existe deja une note de frais 
+	// pour l'utilisateur et le mois fournis
+	this.hasNoteDeFrais = function(utilisateur, mois, annee) {
+		var ndfs = RestApi.get(
+		"../API/bdm/businessData/com.company.model.NoteDeFrais?q=" 
+		+ "findByMoisAndAnneeComptable" 
+		+ "&amp;p=0&amp;c=1000"
+		+ "&amp;f=anneeComptable=" + annee 
+		+ "&amp;f=moisComptable=" + mois 
+		+ "&amp;f=utilisateur=" + utilisateur);
+		return ndfs !== null && ndfs.length > 0;
+	}
+}
+
+RestApi.Bdm = new BdmObject();
+	</pre>
+	</div>
+	
+	<p>
+	Cet asset permet notamment :
+	</p>
+	<ul>
+		<li>de faire appel à l'API Rest : <span class="inline-code">RestApi.get()</span> ;</li>
+		<li>de récuperer l'id de l'utilisateur courant : <span class="inline-code">RestApi.Identity.getCurrentUserId()</span> ;</li>
+		<li>de récuperer les pièces jointes liées à une note de frais : <span class="inline-code">RestApi.Bpm.getCaseDocuments()</span> ;</li>
+		<li>de vérifier l'existance d'une note de frais pour un mois comptable donné : <span class="inline-code">RestApi.Bdm.hasNoteDeFrais()</span>.</li>
+	</ul>
+	
+</section>
+
+<section id="proc">
+	<header>
+		<h1 class="num-section">3</h1><h1>Processus</h1><span style="float:right"><a href="#proc"><h1>[proc]</h1></a></span>
+	</header>
+	
+	<section id="proc.presentation">
+		<header>
+			<h2 class="num-section">3.1</h2><h2>Présentation du processus</h2><span style="float:right"><a href="#proc.presentation"><h2>[proc.presentation]</h2></a></span>
+		</header>
+	
+	<p>
+	Ci-dessous une capture d'ecran du processus dans <i>Bonita</i>.
+	</p>
+	
+	<img src="process.png" alt="Image du processus introuvable" title="Image du processus" width="700px"/>
+	
+	<p>
+	Le processus se découpe en plusieurs activités qui seront détailler ci-après. D'une manière globale, 
+	le processus se déroule comme suit : l'utilisateur créer une note de frais et peut soit la sauvegarder 
+	soit la soumettre pour validation ; tant que la note de frais n'est pas complète, l'utilisateur peut 
+	la modifier ; lorsque la note de frais passe à l'étape de validation, le validateur peut l'accepter ou 
+	la refuser ; si le validateur refuse la note de frais, l'utilisateur doit la complèter/modifier 
+	jusqu'à temps que les deux personnes soient d'accord ; une fois la note de frais validée, 
+	l'utilisateur clôt le processus en confirmant qu'il a bien reçut le montant indiqué.
+	</p>
+	
+	</section>
+	
+	<section id="proc.acteurs">
+		<header>
+			<h2 class="num-section">3.2</h2><h2>Acteurs</h2><span style="float:right"><a href="#proc.acteurs"><h2>[proc.acteurs]</h2></a></span>
+		</header>
+	
+	<p>
+	Le développement d'un processus nécessite de définir un ensemble d'acteurs intervenant dans le 
+	processus. Trois acteurs seront utilisés dans le processus que nous décrivons :
+	</p>
+	<ul>
+		<li>Employé : réprésente l'employé pouvant déclarer une note de frais</li>
+		<li>Validateur : personne capable de valider une note de frais</li>
+		<li>Comptabilité : acteur fictif, les tâches réalisés par cet acteur sont automatiques</li>
+	</ul>
+	<p>
+	<i>Remarque</i> : Pour le développement du processus, les acteurs ne seront pas définies et une même 
+	personne pourra à priori déclarer et valider une note de frais. Il est évident qu'une fois 
+	le processus mis en production, un tel comportement n'est pas envisageable. Ce sera à l'administateur 
+	du portail Bonita BPM de définir les associations entre acteurs et utilisateurs.
+	</p>
+	</section>
+	
+	<section id="proc.variables">
+		<header>
+			<h2 class="num-section">3.3</h2><h2>Variables et documents</h2><span style="float:right"><a href="#proc.variables"><h2>[proc.activites]</h2></a></span>
+		</header>
+	
+	<p>
+	Cette section décrit l'ensemble des variables et documents utilisés lors de l'éxecution d'un cas 
+	du processus.
+	</p>
+	<p>
+	<i>Remarque</i> : on peut définir ces variables et documents dans <i>Bonita</i> en cliquant sur 
+	le diagramme du processus, puis sur l'onglet <i>Données</i>, puis <i>Variables du pool</i> / 
+	<i>Documents</i>.
+	</p>
+	
+	<table class="contrat">
+		<caption>Variables métiers</caption>
+		<tbody>
+			<tr class="entete">
+				<td>Nom</td>
+				<td>Type</td>
+			</tr>
+			<tr>
+				<td>note_de_frais</td>
+				<td>NoteDeFrais</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<p>
+	<i>Remarque</i> : on initialisera la variable <i>note_de_frais</i> à partir d'un script utilisant les 
+	données fournies par le formulaire d'instanciation décrit plus tard.
+	</p>
+	
+	<table class="contrat">
+		<caption>Documents</caption>
+		<tbody>
+			<tr class="entete">
+				<td>Nom</td>
+				<td>Multiplicité</td>
+				<td>Initialisation</td>
+			</tr>
+			<tr>
+				<td>pieces_jointes</td>
+				<td>Multiple</td>
+				<td>Contrat</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	
+	</section>
+	
+	
+	<section id="proc.activites">
+		<header>
+			<h2 class="num-section">3.4</h2><h2>Activités</h2><span style="float:right"><a href="#proc.activites"><h2>[proc.activites]</h2></a></span>
+		</header>
+	
+	<p>
+	Cette section décrit l'ensemble des activités du processus. Elle se décompose en quatres 
+	sous-parties: la création de la note de frais ; la modification d'une note de frais ; la validation 
+	d'une note de frais ; et la clôture du cas par l'utilisateur l'ayant démarré.
+	</p>
+	
+	</section>
+	
+	<section id="proc.activites.creer">
+		<header>
+			<h3 class="num-section">3.4.1</h3><h3>Créer une note de frais</h3><span style="float:right"><a href="#proc.activites.creer"><h3>[proc.activites.creer]</h3></a></span>
+		</header>
+	
+	<p>
+	Cette activité permet de démarrer un cas du processus de gestion des notes de frais.
+	L'utilisateur peut y définir une note de frais et la soumettre à validation ou la sauvegarder 
+	pour la compléter plus tard.
+	</p>
+	
+		<section id="proc.activites.creer.contrat">
+			<header>
+				<h3 class="num-section">3.4.1.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.creer.contrat"><h3>[proc.activites.creer.contrat]</h3></a></span>
+			</header>
+		
+		<p>
+		Pour pouvoir démarrer le processus, il est nécessaire de fournir un minimum d'information.
+		L'ensemble des ces informations est listé dans le <i>contrat</i> ci-dessous.
+		</p>
+		
+		<table class="contrat">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Multiple</td>
+				</tr>
+				<tr>
+					<td>form_note_de_frais_complete</td>
+					<td>BOOLEAN</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>form_note_de_frais</td>
+					<td>COMPLEX</td>
+					<td/>
+				</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>moisComptable</td>
+						<td>TEXT</td>
+						<td/>
+					</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>anneeComptable</td>
+						<td>INTEGER</td>
+						<td/>
+					</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>elements</td>
+						<td>COMPLEX</td>
+						<td>oui</td>
+					</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>type</td>
+							<td>TEXT</td>
+							<td/>
+						</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>dateDepense</td>
+							<td>DATE</td>
+							<td/>
+						</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>affaire</td>
+							<td>INTEGER</td>
+							<td/>
+						</tr>
+				<tr>
+					<td>form_pieces_jointes</td>
+					<td>FILE</td>
+					<td>oui</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<p>
+		<i>Remarque 1</i> : les informations notées obligatoires pour la création des objets métiers et non 
+		présente dans le contrat sont calculés de manière programmatique ou ont des valeurs par défaut 
+		évidentes. Pour le champ <i>montant</i>, il est soit fournit via le formulaire, soit calculé 
+		à partir de <i>distance</i> et <i>coutKm</i> pour le type "KMS" ; il ne peut donc pas faire partie 
+		du contrat.
+		</p>
+		
+		<p>
+		<i>Remarque 2</i> : l'élément <i>form_pieces_jointes</i> est utilisé pour initialiser les 
+		documents du cas (cf. <a href="#proc.variables">3.3</a>) ; il peut être vide s'il n'y a pas de 
+		pièce jointe.
+		</p>
+		
+		
+		</section>
+	
+		<section id="proc.activites.creer.formulaire">
+			<header>
+				<h3 class="num-section">3.4.1.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.creer.formulaire"><h3>[proc.activites.creer.formulaire]</h3></a></span>
+			</header>
+			
+		<p>
+		Cette section décrit le formulaire permettant d'instantier le processus. Un visuel puis une 
+		description plus détaillée sont fournis.
+		</p>
+		
+		
+		<img src="form_creer.png" alt="Image du formulaire introuvable" title="Image du formulaire de création de note de frais" width="700px"/>
+
+		<p>
+		Le formulaire permet à l'utilisateur d'entrer le mois comptable pour sa note de frais. Il 
+		permet également d'ajouter un nombre arbitraire d'élément à la note de frais. L'utilisateur 
+		doit préciser pour chaque élément de la note de frais la date et le montant ainsi que le type 
+		de la dépense. Il doit également préciser quelle affaire a entraîner la dépense et peut s'il le 
+		veut fournir une indication sur la preuve de la dépense. <br/>
+		L'utilisateur peut ajouter un nombre arbitraire de pièces jointes et peut entrer un commentaire 
+		avant soit de sauvegarder sa note de frais - auquel cas il pourra la modifier plus tard - soit 
+		de la soumettre à validation.
+		</p>
+		
+		
+		<p>
+		Voici une capture de la mise en place du formulaire dans l'outil UI-Designer de Bonita.
+		</p>
+		
+		<img id="ui-designer-creer" alt="Capture introuvable" src="ui-designer-creer.png" width="700px" />
+	
+		<p>
+		Les widgets permettant de choisir le type, de saisir un montant, de sélectionner une date, une affaire 
+		et de rentrer un justificatif font tous 2 colonnes. Les boutons font également tous 2 colonnes. <br/>
+		Les deux widgets permettant de saisir une distance et un coût au kilomètre dans le cas d'un déplacement 
+		en voiture font 1 colonne. Ces widgets sont cachés si le type de l'élément n'est pas "KMS" : 
+		<span class="inline-code">$item.type != "KMS"</span>. <br/>
+		Le widget permettant de saisir un montant est désactivé et caché si le type est "KMS" :
+		<span class="inline-code">$item.type == "KMS"</span>. <br/>
+		Pour l'ensemble de ces widgets, le libellé est masqué.
+		La mention indiquant qu'une note de frais existe déjà est masqué et les boutons permettant de valider 
+		le formulaire sont désactivés si il n'existe pas de note de frais pour le mois sélectionné : 
+		<span class="inline-code">note_de_frais_existante == false</span> où la variable <i>note_de_frais_existante</i> vaut :
+		</p>
+		
+		<div class="code">
+		<pre>
+var annee = $data.formInput.input_note_de_frais.anneeComptable;
+var mois = $data.formInput.input_note_de_frais.moisComptable;
+return RestApi.Bdm.hasNoteDeFrais(RestApi.Identity.getCurrentUserId(),
+                                  mois, 
+                                  annee);
+</pre>
+		</div>
+		
+		</section>
+		
+		<section id="proc.activites.creer.init">
+			<header>
+				<h3 class="num-section">3.4.1.3</h3><h3>Initialisations</h3><span style="float:right"><a href="#proc.activites.creer.init"><h3>[proc.activites.creer.init]</h3></a></span>
+			</header>
+			
+		<p>
+		L'initialisation de la variable métier <i>note_de_frais</i> se fait avec le code suivant :
+		</p>
+
+		<div class="code">
+		<pre>
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+
+import com.company.model.NoteDeFrais;
+import com.company.model.ElementNoteDeFrais;
+
+ProcessInstance processInstance = apiAccessor.getProcessAPI().getProcessInstance(processInstanceId);
+
+NoteDeFrais note_de_frais = new NoteDeFrais();
+note_de_frais.setEstComplete(form_note_de_frais_complete);
+note_de_frais.setMoisComptable(form_note_de_frais.get("moisComptable"));
+note_de_frais.setAnneeComptable(form_note_de_frais.get("anneeComptable"));
+note_de_frais.setDateCreation(new Date());
+note_de_frais.setUtilisateur(processInstance.getStartedBy());
+note_de_frais.setCommentaires(form_note_de_frais.get("commentaires"));
+note_de_frais.setCas(processInstanceId);
+
+List&lt;Map&lt;String,Object>> input_elements = form_note_de_frais.get("elements");
+List&lt;ElementNoteDeFrais> elements = new ArrayList&lt;ElementNoteDeFrais>();
+for (Map&lt;String,Object> input_entree : input_elements)
+{
+	ElementNoteDeFrais entree = new ElementNoteDeFrais();
+	entree.setType(input_entree.get("type"));
+	entree.setDateDepense(input_entree.get("dateDepense"));
+	entree.setAffaire(input_entree.get("affaire"));
+
+	if(input_entree.containsKey("justificatif"))
+	{
+		entree.setJustificatif(input_entree.get("justificatif"));
+	}
+	
+	if(entree.getType() == "KMS")
+	{
+		double cout_km = input_entree.get("coutKm");
+		double dist = input_entree.get("distance");
+		entree.setCoutKm(cout_km);
+		entree.setDistance(dist);
+		entree.setMontant(dist*cout_km);
+	}
+	else
+	{
+		entree.setMontant(input_entree.get("montant"));
+	}
+	
+	elements.add(entree);
+}
+note_de_frais.setElements(elements);
+
+return note_de_frais;
+		</pre>
+		</div>
+		
+		<p>
+		L'initialisation des documents <i>pieces_jointes</i> se fait à partir de la valeur 
+		<i>form_pieces_jointes</i>.
+		</p>
+		
+		</section>
+	
+	</section>
+	
+	<section id="proc.activites.completer">
+		<header>
+			<h3 class="num-section">3.4.2</h3><h3>Compléter une note de frais</h3><span style="float:right"><a href="#proc.activites.completer"><h3>[proc.activites.completer]</h3></a></span>
+		</header>
+	
+	<p>
+	Cette activité est la plus complexe car elle se présente sous deux formes différentes : l'utilisateur 
+	ayant sauvegardé une note de frais peut la compléter avant de la soumettre à validation ; 
+	l'utilisateur dont la note de frais a été refusée doit la modifier pour qu'elle puisse être revalidée. 
+	</p>
+	
+	<p>
+	Dans le premier cas, l'ensemble des champs doit être éditable et l'utilisateur peut à nouveau 
+	sauvegarder sa note ou la soumettre. <br/>
+	Dans le second cas, les éléments de la note de frais déjà validés ne doivent plus être éditable mais 
+	doivent quand même apparaître, le commentaire du validateur doit apparaîte pour expliquer la raison du refus à l'utilisateur, le bouton de sauvegarde ne doit pas apparaître.
+	</p>
+	
+		<section id="proc.activites.completer.contrat">
+			<header>
+				<h3 class="num-section">3.4.2.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.completer.contrat"><h3>[proc.activites.completer.contrat]</h3></a></span>
+			</header>
+		
+		<p>
+		Voici une proposition de contrat pour cette activité.
+		</p>
+		
+		<table class="contrat">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Multiple</td>
+				</tr>
+				<tr>
+					<td>form_note_de_frais_complete</td>
+					<td>BOOLEAN</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>form_note_de_frais</td>
+					<td>COMPLEX</td>
+					<td/>
+				</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>moisComptable</td>
+						<td>TEXT</td>
+						<td/>
+					</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>anneeComptable</td>
+						<td>INTEGER</td>
+						<td/>
+					</tr>
+					<tr>
+						<td>
+							<span class="indentation"/>elements</td>
+						<td>COMPLEX</td>
+						<td>oui</td>
+					</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>type</td>
+							<td>TEXT</td>
+							<td/>
+						</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>montant</td>
+							<td>DECIMAL</td>
+							<td/>
+						</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>dateDepense</td>
+							<td>DATE</td>
+							<td/>
+						</tr>
+						<tr>
+							<td>
+								<span class="indentation"/><span class="indentation"/>affaire</td>
+							<td>INTEGER</td>
+							<td/>
+						</tr>
+				<tr>
+					<td>form_pieces_jointes</td>
+					<td>FILE</td>
+					<td>oui</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<p>
+		<i>Remarque</i> : le contrat est le même que pour la création d'une note de frais.
+		</p>
+
+		
+		</section>
+	
+		<section id="proc.activites.completer.formulaire">
+			<header>
+				<h3 class="num-section">3.4.2.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.completer.formulaire"><h3>[proc.activites.completer.formulaire]</h3></a></span>
+			</header>
+		
+		<p>
+		Le formulaire se présente sous deux formes : 
+		</p>
+		
+		<img src="form_completer.png" alt="Image du formulaire introuvable" title="Image du formulaire de modification de note de frais" width="700px"/>
+
+		<p>
+		et
+		</p>
+		
+		<img src="form_modifier.png" alt="Image du formulaire introuvable" title="Image du formulaire de modification de note de frais" width="700px"/>
+		
+		<p>
+		Le formulaire permet à l'utilisateur de modifier une note de frais existante dans le cas 
+		où elle serait incomplète et dans le cas où elle aurait été refusée à l'étape de 
+		validation. Ce formulaire ressemble fortement au formulaire de création d'une note de frais.
+		</p>
+
+		<p>
+		La mise en place de ce formulaire dans le UI-Designer ressemble à la capture suivante :
+		</p>
+		
+		<img src="ui-designer-modifier.png" alt="Image introuvable" width="700px"/>
+		
+		<p>
+		Le téléchargement des pièces jointes se fait avec des widgets <i>Link</i>, en itérant sur la variable 
+		<i>pieces_jointes</i> dont la valeur est
+		</p>
+		
+		<div class="code">
+		<pre>return $data.context.pieces_jointes_ref;</pre>
+		</div>
+		
+		<p>
+		Le texte des liens vaut <br/> <span class="inline-code">Télécharger  {{$item.fileName}}</span> <br/> et 
+		l'URL cible<br/> <span class="inline-code">"/bonita/portal/"+$item.url</span>.
+		
+		</section>
+		
+		<section id="proc.activites.completer.ops">
+			<header>
+				<h3 class="num-section">3.4.2.3</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.completer.ops"><h3>[proc.activites.completer.ops]</h3></a></span>
+			</header>
+			
+		<p>
+		Deux opérations doivent être effectuées : la note de frais doit être mise à jour et la liste des
+		pièces jointes doit être modifiée si de nouvelles pièces jointes ont été envoyées.
+		</p>
+		
+		<p>
+		La mise à jour de la note de frais se fait avec le code suivant :
+		</p>
+		
+		<div class="code">
+		<pre>
+import com.company.model.NoteDeFrais;
+import com.company.model.ElementNoteDeFrais;
+
+note_de_frais.setEstComplete(form_note_de_frais_complete);
+
+note_de_frais.setMoisComptable(form_note_de_frais.get("moisComptable"));
+note_de_frais.setAnneeComptable(form_note_de_frais.get("anneeComptable"));
+note_de_frais.setCommentaires(form_note_de_frais.get("commentaires"));
+
+List&lt;Map&lt;String,Object>> input_elements = form_note_de_frais.get("elements");
+List&lt;ElementNoteDeFrais> ancien_elements = note_de_frais.getElements();
+List&lt;ElementNoteDeFrais> elements = new ArrayList&lt;ElementNoteDeFrais>();
+
+for (Map&lt;String,Object> input_entree : input_elements)
+{
+	ElementNoteDeFrais entree;
+	
+	// si l'entree a deja un persistenceId on n'a rien a creer
+	// mais il faut mettre a jour
+	if(input_entree.containsKey("persistenceId"))
+	{
+		for(ElementNoteDeFrais e : ancien_elements)
+		{
+			if(e.getPersistenceId() == input_entree.get("persistenceId"))
+			{
+				entree = e;
+			}
+		}
+		
+		// il faudrait en théorie s'assurer que entree != null ...
+	}
+	else
+	{
+		entree = new ElementNoteDeFrais();
+	}
+	
+	entree.setType(input_entree.get("type"));
+	entree.setDateDepense(input_entree.get("dateDepense"));
+	entree.setAffaire(input_entree.get("affaire"));
+
+	if(input_entree.containsKey("justificatif"))
+	{
+		entree.setJustificatif(input_entree.get("justificatif"));
+	}
+	
+	
+	if(entree.getType() == "KMS")
+	{
+		double cout_km = input_entree.get("coutKm");
+		double dist = input_entree.get("distance");
+		entree.setCoutKm(cout_km);
+		entree.setDistance(dist);
+		entree.setMontant(dist*cout_km);
+	}
+	else
+	{
+		entree.setCoutKm(null);
+		entree.setDistance(null);
+		entree.setMontant(input_entree.get("montant"));
+	}
+	
+	elements.add(entree);
+}
+note_de_frais.setElements(elements);
+
+return note_de_frais;</pre>
+		</div>
+		
+	<p>
+	L'ajout de pièces jointes se fait avec le code suivant :
+	</P>
+	
+	<div class="code">
+	<pre>
+import org.bonitasoft.engine.bpm.contract.FileInputValue
+import org.bonitasoft.engine.bpm.document.Document
+import org.bonitasoft.engine.bpm.document.DocumentValue
+
+int index = 0;
+int numberOfResult = 1;
+List&lt;Document> documents;
+List&lt;FileInputValue> filesInputValue = new ArrayList&lt;FileInputValue>();
+
+while((documents = apiAccessor.processAPI.getDocumentList(processInstanceId, "pieces_jointes", index, numberOfResult)).size()) {
+	for(Document currentDocument : documents) {
+		FileInputValue fileInputValue = new FileInputValue(
+		currentDocument.contentFileName, 
+		apiAccessor.processAPI.getDocumentContent(currentDocument.contentStorageId)
+		);
+		
+		filesInputValue.add(fileInputValue);
+	}
+	index += numberOfResult;
+}
+
+List&lt;Object> resultat = new ArrayList&lt;Object>();
+resultat.addAll(filesInputValue);
+resultat.addAll(form_pieces_jointes);
+
+
+return resultat;</pre>
+	</div>
+	
+	<p>
+	<i>Remarque </i> :Ce code utilise des fonctionnalités de Bonita peut documenter et il faudra peut-être 
+	faire quelque rechercher pour vérifier qu'il fonctionne bien.
+	</p>
+		
+		</section>
+	
+	</section>
+	
+	
+	<section id="proc.activites.valider">
+		<header>
+			<h3 class="num-section">3.4.3</h3><h3>Valider une note de frais</h3><span style="float:right"><a href="#proc.activites.valider"><h3>[proc.activites.valider]</h3></a></span>
+		</header>
+	
+	<p>
+	Dans cette activité, une personne est chargé de vérifier la note de frais et de la valider 
+	ou non. Dans le cas où la personne refuse, elle indiquera un commentaire permettant à 
+	la personne ayant déclarer sa note de savoir comment la modifier pour qu'elle soit acceptée.
+	</p>
+	
+		<section id="proc.activites.valider.contrat">
+			<header>
+				<h3 class="num-section">3.4.3.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.valider.contrat"><h3>[proc.activites.valider.contrat]</h3></a></span>
+			</header>
+		
+		<p>
+		Le contrat pour cette activité est le suivant :
+		</p>
+		
+		<table class="contrat">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Multiple</td>
+				</tr>
+				<tr>
+					<td>form_note_de_frais_validee</td>
+					<td>BOOLEAN</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>form_commentaire_validateur</td>
+					<td>TEXT</td>
+					<td/>
+				</tr>
+			</tbody>
+		</table>
+
+		
+		</section>
+	
+		<section id="proc.activites.valider.formulaire">
+			<header>
+				<h3 class="num-section">3.4.3.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.valider.formulaire"><h3>[proc.activites.valider.formulaire]</h3></a></span>
+			</header>
+		
+		<p>
+		Le formulaire permet au validateur de visualiser les éléments de la note de frais et de télécharger 
+		les pièces jointes.
+		</p>
+		
+		<img src="form_valider.png" alt="Image du formulaire introuvable" title="Image du formulaire de validation de note de frais" width="700px"/>
+		
+		</section>
+		
+		<section id="proc.activites.valider.ops">
+			<header>
+				<h3 class="num-section">3.4.3.3</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.valider.ops"><h3>[proc.activites.valider.ops]</h3></a></span>
+			</header>
+			
+		<p>
+		Les champs <i>estValidee</i>, <i>dateValidation</i> et <i>commentairesValidateur</i> de la note
+		de frais doivent être mis à jour. Les champs <i>acceptee</i> de chaque éléments de la note de 
+		frais doivent également être modifiés.
+		</p>
+		
+	<div class="code">
+	<pre>
+import com.company.model.NoteDeFrais;
+
+note_de_frais.setEstValidee(form_note_de_frais_validee);
+note_de_frais.setCommentairesValidateur(form_commentaires_validateur);
+if(form_note_de_frais_validee)
+{
+	note_de_frais.setDateValidation(new Date());
+}
+
+return note_de_frais;
+</pre>
+	</div>
+		
+		</section>
+	
+	</section>
+	
+
+	
+	<section id="proc.activites.terminer">
+		<header>
+			<h3 class="num-section">3.4.4</h3><h3>Terminer le processus</h3><span style="float:right"><a href="#proc.activites.terminer"><h3>[proc.activites.terminer]</h3></a></span>
+		</header>
+	
+	<p>
+	Dans cette activité, la personne ayant déclaré la note de frais clôt le cas en confirmant avoir 
+	bien reçut le remboursement.
+	</p>
+	
+		<section id="proc.activites.terminer.contrat">
+			<header>
+				<h3 class="num-section">3.4.4.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.terminer.contrat"><h3>[proc.activites.terminer.contrat]</h3></a></span>
+			</header>
+		
+		<p>
+		Le contrat pour cette activité est vide.
+		</p>
+		
+		</section>
+	
+		<section id="proc.activites.terminer.formulaire">
+			<header>
+				<h3 class="num-section">3.4.4.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.terminer.formulaire"><h3>[proc.activites.terminer.formulaire]</h3></a></span>
+			</header>
+			
+		<p>
+		Le formulaire affiche l'ensemble des informations concernant la note de frais à l'utilisateur 
+		et un simple bouton lui demande de confirmer s'il a bien reçut le montant total indiqué. En 
+		cliquant sur le bouton, l'utilisateur clôt le cas. En cas de problème, il doit contacter 
+		un responsable quelconque et une fois le problème régler appuyer sur le bouton.
+		</p>
+		
+		</section>
+		
+		<section id="proc.activites.terminer.ops">
+			<header>
+				<h3 class="num-section">3.4.4.3</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.terminer.ops"><h3>[proc.activites.terminer.ops]</h3></a></span>
+			</header>
+			
+		<p>
+		Il n'y a aucune opération a effectuer pour cette activité.
+		</p>
+		
+		</section>
+	
+	</section>
+	
+	
+</section>
+
+<section id="apps">
+	<header>
+		<h1 class="num-section">4</h1><h1>Applications</h1><span style="float:right"><a href="#apps"><h1>[apps]</h1></a></span>
+	</header>
+	
+	<p>
+	Cette section décrit les applications fournit en parallèle du processus outillé dans <i>Bonita</i>. 
+	Deux applications sont proposées : la première permet à un utilisateur de consulter l'ensemble de 
+	ses notes de frais ; la seconde permet à un administrateur de consulter l'ensemble des notes 
+	de frais des utilisateurs. <br/> 
+	Chacune des deux applications présentés est contistué d'une unique page.
+	</p>
+	
+	<section id="apps.notes">
+		<header>
+			<h1 class="num-section">4.1</h1><h1>Mes notes de frais</h1><span style="float:right"><a href="#apps.notes"><h1>[apps.notes]</h1></a></span>
+		</header>
+		
+		<b>Cette application est encore en developpement.....</b>
+		
+		<p>
+		L'application <i>Mes notes de frais</i> permet à un utilisateur de consulter l'ensemble de 
+		ses notes de frais et d'en extraire quelques statisitques. <br/>
+		L'image suivante donne un aperçu de la mise en page possible (les nombres sont incorrects 
+		car fictifs).
+		</p>
+		
+		<img src="apps-notes.png" width="700px" alt="Image application introuvable" title="Page - Mes notes de frais"/>
+		
+		
+		<p>
+		L'ensemble des notes de frais de l'utilisateur est affiché dans un tableau indiquant le mois 
+		comptable, le montant total de la note de frais et le statut de la note de frais. <br/>
+		Quatres statuts sont possibles :
+		</p>
+		<ul>
+			<li><i>Validée</i> : la note de frais est validée</li>
+			<li><i>En attente de validation</i> : la note de frais est complète et doit être validée</li>
+			<li><i>En attente de modification</i> : la note de frais est complète mais n'a pas passé l'étape de validation et doit être modifiée</li>
+			<li><i>Incomplète</i> : la note de frais est incomplète et n'a pas encore été soumise à validation</li>
+		</ul>
+		
+		<p>
+		L'utilisateur peut s'il le veut filtrer la liste des résultats en sélectionnant une année dans 
+		la liste déroulante au sommet de la page. <br/>
+		Cette liste déroulante ne devra proposer que des années pour lesquelles il existe au moins une 
+		note de frais.
+		</p>
+
+		<p>
+		Lorsqu'une note de frais est sélectionnée dans le tableau, son détail s'affiche en dessous du 
+		tableau. Cela inclut le commentaire du validateur en dessous du commentaire de l'utilisateur 
+		si la note a été validée.
+		</p>
+		
+		<p>
+		Enfin, on trouve en bas de page diverses statistiques sur les notes de frais affichées dans 
+		le tableau.
+		</p>
+		
+		<p>
+		Le montant des dépenses par catégories est calculé et affiché. L'utilisateur peut filtrer 
+		d'avantage l'ensemble des notes sur lequel les calculs sont effectués en sélectionnant une 
+		affaire dans la liste déroulante. Une fois de plus, la liste déroulante ne doit proposer que 
+		des affaires pour lesquels une note de frais existe pour l'utilisateur et pour l'année 
+		sélectionnée.
+		</p>
+		
+		<p>
+		Le montant des dépenses par affaires est également calculé et affiché. Là aussi, l'utilisateur 
+		peut obtenir d'avantage d'informations en demandant à ce que les calculs ne soient effectués 
+		que sur la base d'une certaine catégorie.
+		</p>
+		
+	</section>
+	
+	<section id="apps.gestion">
+		<header>
+			<h1 class="num-section">4.2</h1><h1>Gestion des notes de frais</h1><span style="float:right"><a href="#apps.gestion"><h1>[apps.gestion]</h1></a></span>
+		</header>
+		
+		<p>
+		L'application <i>Gestion des notes de frais</i> étend l'application présentée précedement. 
+		Elle permet à un administrateur de visualiser l'ensemble des notes de frais.
+		</p>
+		
+		<img src="apps-gestion.png" width="700px" alt="Image application introuvable" title="Page - Gestion des notes de frais"/>
+		
+		<p>
+		L'application fonctionne de la même manière que celle fournit pour l'utilisateur à la différence 
+		que l'administrateur peut filtrer les résultats selon une année, un mois et un utilisateur et 
+		que le nom de l'utilisateur ayant déclaré la note de frais est affiché dans le tableau.
+		</p>
+		
+		<p>
+		Voici un aperçut de sa mise en place dans le UI-Designer
+		</p>
+		
+		<img src="ui-designer-page-gestion-notes.png" width="700px" alt="Image application introuvable" title="UI-Designer Page - Gestion des notes de frais"/>
+		
+		<p>
+		Les variables utilisées pour le formulaire sont listés ci-dessous.
+		</p>
+		
+		<div class="variable-formulaire">
+		<div class="nom">annees_disponibles</div>
+		<div class="description">Renvoie la liste des années pouvant être utilisées pour filtrer les notes de frais</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-gestion-code-annees_disponibles" />
+		<label for="form-gestion-code-annees_disponibles">Afficher / Masquer le code</label>
+		<div class="code">
+<pre>var resultat = ["Toutes"];
+
+if(!angular.isDefined($data.notes_de_frais)) {
+    return resultat;
+}
+
+for(var i = 0; i &lt; $data.notes_de_frais.length; i++)
+{
+    if(resultat.indexOf($data.notes_de_frais[i].annee_comptable) == -1) {
+        resultat.push($data.notes_de_frais[i].annee_comptable);
+    }
+}
+
+return resultat;</pre>
+		</div>
+		</div>
+		</div>
+		
+		
+		<div class="variable-formulaire">
+		<div class="nom">formulaire</div>
+		<div class="description">Variable utilisée pour récupérer les données rentrées par l'utilisateur</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-gestion-code-formulaire" />
+		<label for="form-gestion-code-formulaire">Afficher / Masquer le code</label>
+		<div class="code">
+<pre>{
+    "annee": null, 
+    "mois": null, 
+    "utilisateur": null,
+    "affaire": null,
+    "categorie": null,
+    "note_de_frais": null
+}</pre>
+		</div>
+		</div>
+		</div>
+		
+		
+		<div class="variable-formulaire">
+		<div class="nom">note_de_frais_filtrees</div>
+		<div class="description">Variable utilisée pour récupérer les données rentrées par l'utilisateur</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-gestion-code-note_de_frais_filtrees" />
+		<label for="form-gestion-code-note_de_frais_filtrees">Afficher / Masquer le code</label>
+		<div class="code">
+<pre>if(!angular.isDefined($data.notes_de_frais)) {
+    return [];
+}
+
+
+var resultat = [];
+
+var predicat = function(ndf) {
+    var annee_selectionnee = $data.formulaire.annee;
+    if(annee_selectionnee !== null &amp;&amp; annee_selectionnee != "Toutes") {
+        if(ndf.annee_comptable != annee_selectionnee) {
+            return false;
+        }
+    }
+    
+    var mois_selectionne = $data.formulaire.mois;
+    if(mois_selectionne !== null &amp;&amp; mois_selectionne != "Tous") {
+        if(ndf.mois_comptable != mois_selectionne) {
+            return false;
+        }
+    }
+    
+    var utilisateur = $data.formulaire.utilisateur;
+    if(utilisateur !== null &amp;&amp; utilisateur != "Tous") {
+        if(ndf.utilisateur != utilisateur) {
+            return false;
+        }
+    }
+    
+    return true;
+};
+
+for(var i = 0; i &lt; $data.notes_de_frais.length; i++)
+{
+    if(predicat($data.notes_de_frais[i]))
+    {
+        resultat.push($data.notes_de_frais[i]);
+    }
+}
+
+return resultat;</pre>
+		</div>
+		</div>
+		</div>
+		
+		
+		<div class="variable-formulaire">
+		<div class="nom">notes_de_frais</div>
+		<div class="description">Liste des notes de frais</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-gestion-code-notes_de_frais" />
+		<label for="form-gestion-code-notes_de_frais">Afficher / Masquer le code</label>
+		<div class="code">
+<pre>
+var creerElementNoteDeFrais = function(elem) {
+    var type = elem.type;
+    var montant = elem.montant;
+    var date_depense = elem.dateDepense;
+    var affaire = elem.affaire;
+    var justificatif = elem.justificatif;
+    var affichage_montant = montant +"\u20AC";
+    if(type == "KMS") {
+        var calcul = elem.distance + "km x ";
+        calcul += elem.coutKm  + "\u20AC\\km = ";
+        affichage_montant = calcul + affichage_montant;
+    }
+    return {
+        "type": type,
+        "montant": montant,
+        "date_depense": date_depense,
+        "affaire": affaire,
+        "justificatif": justificatif,
+        "affichage_montant": affichage_montant
+    };
+};
+
+var creerNoteDeFrais = function(ndf) {
+    var id_note_de_frais = ndf.persistenceId;
+    var id_utilisateur = ndf.utilisateur;
+    var mois_comptable = ndf.moisComptable;
+    var annee_comptable =ndf.anneeComptable;
+    var commentaires = ndf.commentaires;
+    var commentaires_validateur = ndf.commentairesValidateur;
+    var elems = [];
+    if(ndf.elements !== null) {
+        for(var i = 0; i &lt; ndf.elements.length; i++) {
+            elems.push(creerElementNoteDeFrais(ndf.elements[i]));
+        }
+    }
+    var statut;
+    if(ndf.estValidee) {
+        statut = "Validée";
+    } else if(ndf.estComplete) {
+        if(ndf.estValidee === null) {
+            statut = "En attente de validation";
+        } else {
+            statut = "En attente de modification";   
+        }
+    } else {
+        statut = "Incomplète";
+    }
+    
+    var montant_total = 0;
+    for(var i = 0; i &lt; elems.length; i++)
+    {
+        montant_total += elems[i].montant;
+    }
+    
+    // utilisation de l'asset pour recuperer les infos utilisateur
+    var user_info = RestApi.Identity.getUser(id_utilisateur);
+    var utilisateur = user_info.firstname + " " + user_info.lastname;
+    
+    return {
+        "id": id_note_de_frais,
+        "id_utilisateur": id_utilisateur,
+        "utilisateur": utilisateur,
+        "mois_comptable": mois_comptable,
+        "annee_comptable": annee_comptable,
+        "commentaires": commentaires,
+        "commentaires_validateur": commentaires_validateur,
+        "elements": elems,
+        "cas": ndf.cas,
+        "statut": statut,
+        "montant": montant_total,
+        "mois_complet": mois_comptable + " " + annee_comptable
+    };
+};
+
+if(!angular.isDefined($data.requete_notes_de_frais)) {
+    return [];
+}
+
+var resultat = [];
+for(var i = 0; i &lt; $data.requete_notes_de_frais.length; i++) {
+	resultat.push(creerNoteDeFrais($data.requete_notes_de_frais[i]));
+}
+return resultat;</pre>
+		</div>
+		</div>
+		</div>
+		
+		
+		<div class="variable-formulaire">
+		<div class="nom">pieces_jointes_note_selectionnee</div>
+		<div class="description">Liste des pièces jointes de la note de frais sélectionnée</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-gestion-code-pieces_jointes_note_selectionnee" />
+		<label for="form-gestion-code-pieces_jointes_note_selectionnee">Afficher / Masquer le code</label>
+		<div class="code">
+<pre>if($data.formulaire.note_de_frais === null) {
+    return {};
+}
+
+if($data.formulaire.note_de_frais.cas === null) {
+    return {};
+}
+
+// utilisation de l'asset pour récuperer les pieces jointes
+return RestApi.Bpm.getCaseDocuments($data.formulaire.note_de_frais.cas);</pre>
+		</div>
+		</div>
+		</div>
+		
+		<p><b>liste à compléter...</b></p>
+		
+	</section>
+	
+</section>
+
+<section id="integration">
+	<header>
+		<h1 class="num-section">5</h1><h1>Intégration</h1><span style="float:right"><a href="#integration"><h1>[integration]</h1></a></span>
+	</header>
+	
+	<p>
+	Pour bien fonctionner, le processus de gestion des notes de frais doit pouvoir accéder à une 
+	liste des affaires pour que l'utilisateur puisse associer à chaque élément de la note de frais 
+	une affaire.
+	</p>
+	<p>
+	Chaque formulaire contient ainsi une variable <i>liste_affaires</i> qu'il faudra modifier pour qu'elle 
+	renvoie la liste des affaires à proposer.
+	</p>
+	
+</section>
+
+
+</body>
+</html>
