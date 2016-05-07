@@ -107,22 +107,22 @@ section img {
 
 
 /* volet déroulant*/
-.variable-formulaire {
+.code-fragment {
 	border: 2px solid grey;
 	border-radius: 2px;
 	margin-top: 2em;
 	margin-bottom: 2em;
 }
-.variable-formulaire .nom, .description, label{
+.code-fragment .nom, .description, label{
 	padding-left: 1em;
 }
-.variable-formulaire .nom, .description{
+.code-fragment .nom, .description{
 	border-bottom: 1px solid grey;
 }
-.variable-formulaire .nom{
+.code-fragment .nom{
 	font-weight: bold;
 }
-.variable-formulaire input {
+.code-fragment input {
 	display: none;
 }
 input ~ .code {
@@ -141,7 +141,7 @@ input:checked ~ .code {
 
 <div class="page">
 <header>
-		<h4 class="auteur">vincent.chambrin</h1><span style="float:right"><h4>[rev.1]</h4></span>
+		<h4 class="auteur">vincent.chambrin</h4><span style="float:right"><h4>[rev.2]</h4></span>
 </header>
 
 <div class="titre-document">
@@ -178,11 +178,18 @@ des processus de Wise IT.
 				</li>
 				<li>
 					<span class="marker">2.3</span><a href="#bdm.note">Objet métier <i>NoteDeFrais</i></a>
+					<ol>
+						<li><span class="marker">2.3.1</span><a href="#bdm.note.req">Requêtes personnalisées</a></li>
+					</ol>
 				</li>
 			</ol>
 		</li>
 		<li>
-			<span class="marker">2</span><a href="#asset">Asset Javascript</a>
+			<span class="marker">2</span><a href="#asset">Asset Javascript et Widgets</a>
+			<ol>
+				<li><span class="marker">2.1</span><a href="#asset.restapi">Asset RestApi</a></li>
+				<li><span class="marker">2.2</span><a href="#asset.chart">Widget GoogleChart</a></li>
+			</ol>
 		</li>
 		<li>
 			<span class="marker">3</span><a href="#proc">Processus</a>
@@ -217,13 +224,16 @@ des processus de Wise IT.
 							<span class="marker">3.4.2</span><a href="#proc.activites.completer">Compléter une note de frais</a>
 							<ol>
 								<li>
-								<span class="marker">3.4.2.1</span><a href="#proc.activites.completer.contrat">Contrat</a>
+								<span class="marker">3.4.2.1</span><a href="#proc.activites.completer.acteur">Acteur</a>
 								</li>
 								<li>
-								<span class="marker">3.4.2.2</span><a href="#proc.activites.completer.formulaire">Formulaire</a>
+								<span class="marker">3.4.2.2</span><a href="#proc.activites.completer.contrat">Contrat</a>
 								</li>
 								<li>
-								<span class="marker">3.4.2.3</span><a href="#proc.activites.completer.operations">Opérations</a>
+								<span class="marker">3.4.2.3</span><a href="#proc.activites.completer.formulaire">Formulaire</a>
+								</li>
+								<li>
+								<span class="marker">3.4.2.4</span><a href="#proc.activites.completer.operations">Opérations</a>
 								</li>
 							</ol>
 						</li>
@@ -242,7 +252,21 @@ des processus de Wise IT.
 							</ol>
 						</li>
 						<li>
-							<span class="marker">3.3.4</span><a href="#proc.activites.terminer">Terminer le processus</a>
+							<span class="marker">3.4.4</span><a href="#proc.activites.confirmer">Confirmer le remboursement</a>
+							<ol>
+								<li>
+								<span class="marker">3.4.4.1</span><a href="#proc.activites.confirmer.acteur">Acteur</a>
+								</li>
+								<li>
+								<span class="marker">3.4.4.2</span><a href="#proc.activites.confirmer.contrat">Contrat</a>
+								</li>
+								<li>
+								<span class="marker">3.4.4.3</span><a href="#proc.activites.confirmer.formulaire">Formulaire</a>
+								</li>
+								<li>
+								<span class="marker">3.4.4.4</span><a href="#proc.activites.confirmer.operations">Opérations</a>
+								</li>
+							</ol>
 						</li>
 					</ol>
 				</li>
@@ -521,6 +545,13 @@ des processus de Wise IT.
 					<td>Oui</td>
 					<td>cas associé à la note ; identifiant Bonita</td>
 				</tr>
+				<tr>
+					<td>estRemboursee</td>
+					<td>BOOLEAN</td>
+					<td>Non</td>
+					<td>Non</td>
+					<td></td>
+				</tr>
 			</tbody>
 		</table>
 		
@@ -545,8 +576,8 @@ des processus de Wise IT.
 		</p>
 		
 		<p>
-		Les champs <i>estComplete</i> et <i>estValidee</i> permettent de savoir si la note de frais est 
-		complète et si elle a été validée.
+		Les champs <i>estComplete</i>, <i>estValidee</i> et<i>estRemboursee</i> permettent de savoir si la note de frais est 
+		complète, si elle a été validée et si elle a été remboursée.
 		</p>
 		
 		<p>
@@ -564,24 +595,105 @@ des processus de Wise IT.
 		dans le UI-Designer.
 		</p>		
 
+		<section id="bdm.note.req">
+			<header>
+				<h2 class="num-section">2.3.1</h2><h2>Requêtes personnalisées</h2><span style="float:right"><a href="#bdm.note.req"><h2>[bdm.note.req]</h2></a></span>
+			</header>
+			
+			<p>
+			Pour faciliter l'utilisation de l'objet métier <i>NoteDeFrais</i> dans les pages et formulaires et pour diminuer 
+			la charge de travail du côté client, nous définissons des reqûetes personnalisées dans Bonita (onglet <i>Requêtes</i> 
+			puis bouton radio <i>Spécifiques</i> dans la fenêtre de gestion du modèle de données métier).
+			</p>
+			
+			<p>
+			Le première requête que nous définissons s'appelle <i>findByMoisAndAnneeComptable</i> et permet de récupérer les notes de 
+			frais pour un utilisateur, un mois et une année donnés. Elle renvoie une liste de notes de frais (type de résultat <i>Multiple</i> dans Bonita).
+			</p>
+			
+			<div class="code-fragment">
+			<div class="nom">findByMoisAndAnneeComptable</div>
+			<div class="description">Requêtes spécifiques -> Multiple (java.util.List)</div>
+			<div class="valeur">
+			<input type="checkbox" id="req-findByMoisAndAnneeComptable" />
+			<label for="req-findByMoisAndAnneeComptable">Afficher / Masquer le code</label>
+			<div class="code">
+			<pre>SELECT n 
+FROM NoteDeFrais n 
+WHERE n.utilisateur = :utilisateur
+AND n.moisComptable = :moisComptable
+AND n.anneeComptable = :anneeComptable
+ORDER BY n.persistenceId ASC</pre>
+			</div>
+			</div>
+			</div>
+			
+			<p>
+			Le deuxième requête que nous définissons s'appelle <i>findAnneesDisponibles</i> et permet de récupérer la liste des années 
+			pour lesquelles une note de frais au moins a été déclarée.
+			</p>
+			
+			<div class="code-fragment">
+			<div class="nom">findAnneesDisponibles</div>
+			<div class="description">Requêtes spécifiques -> Multiple (java.lang.Integer)</div>
+			<div class="valeur">
+			<input type="checkbox" id="req-findAnneesDisponibles" />
+			<label for="req-findAnneesDisponibles">Afficher / Masquer le code</label>
+			<div class="code">
+			<pre>SELECT DISTINCT anneeComptable
+FROM NoteDeFrais
+ORDER BY anneeComptable ASC</pre>
+			</div>
+			</div>
+			</div>
+			
+		</section>
+		
 	</section>
 	
 </section>
 
 <section id="asset">
 	<header>
-		<h1 class="num-section">2</h1><h1>Asset Javascript</h1><span style="float:right"><a href="#asset"><h1>[asset]</h1></a></span>
+		<h1 class="num-section">2</h1><h1>Asset Javascript et Widgets</h1><span style="float:right"><a href="#asset"><h1>[asset]</h1></a></span>
 	</header>
 	
 	<p>
 	Les formulaires et pages créés utilisent un asset Javascript permettant d'accéder plus facilement 
-	à l'API Rest et de limiter le nombre de variable à créer dans chaque formulaire.
+	à l'API Rest et de limiter le nombre de variable à créer dans chaque formulaire. Ils utilisent également 
+	un widget personnalisé permettant de dessiner des graphes.
+	</p>
+	
+	<section id="asset.restapi">
+	<header>
+		<h2 class="num-section">2.1</h2><h2>Asset RestApi</h2><span style="float:right"><a href="#asset.restapi"><h2>[asset.restapi]</h2></a></span>
+	</header>
+
+	<p>
+	L'asset RestApi permet de faire appel à l'API REST depuis un script Javascript. La mise en cache de certain résultat permet 
+	d'accélerer grandement l'affichage des pages et de réduire la charge côté serveur.
 	</p>
 	
 	<p>
-	Le code source de cet asset est fournit ci-après:
+	Cet asset permet notamment :
 	</p>
+	<ul>
+		<li>de faire appel à l'API Rest : <span class="inline-code">RestApi.get()</span> ;</li>
+		<li>de récuperer l'id de l'utilisateur courant : <span class="inline-code">RestApi.Identity.getCurrentUserId()</span> ;</li>
+		<li>de récuperer les pièces jointes liées à une note de frais : <span class="inline-code">RestApi.Bpm.getCaseDocuments()</span> ;</li>
+		<li>de vérifier l'existance d'une note de frais pour un mois comptable donné : <span class="inline-code">RestApi.Bdm.hasNoteDeFrais()</span>.</li>
+		<li>de récuperer les notes de frais pour une année donnée : <span class="inline-code">RestApi.Bdm.getNoteDeFraisAnnee()</span>.</li>
+		<li>de récuperer les notes de frais pour une année, un mois et un utilisateur donnés : <span class="inline-code">RestApi.Bdm.getNoteDeFraisAnneeMoisUtilisateur()</span>.</li>
+		<li>de récuperer les notes de frais répondant à un critère de recherche donné (utilisé dans les applications) : <span class="inline-code">RestApi.Bdm.getNoteDeFrais()</span>.</li>
+		<li>de récupérer la liste des utilisateurs ayant déclaré une note de frais pour une année donnée : <span class="inline-code">RestApi.Bdm.utilisateursNoteDeFraisAnnee()</span>.</li>
+	</ul>
 	
+	<div class="code-fragment">
+	<div class="nom">rest-api.js</div>
+	<div class="description">Asset Javascript</div>
+	<div class="valeur">
+	<input type="checkbox" id="asset-rest-api" />
+	<label for="asset-rest-api">Afficher / Masquer le code</label>
 	<div class="code">
 	<pre>
 
@@ -645,6 +757,7 @@ function IdentityObject() {
 		return RestApi.get("../API/system/session/unusedid");
 	}
 	
+	// renvoie l'id de l'utilisateur courant
 	this.getCurrentUserId = function() {
 		var current_user = this.getCurrentUser();
 		if(current_user != null) {
@@ -659,53 +772,240 @@ RestApi.Identity = new IdentityObject();
 
 function BpmObject() {
 	
-	// renvoie la liste des documents associés à un cas 
-	// fonction pas encore suffisament testée
-	this.getCaseDocuments = function(case_id) {
-		var docs = RestApi.get(
-		"../API/bpm/archivedCaseDocument?p=0&amp;c=25" 
-		+ "&amp;f=caseId=" + case_id);
-		if(docs === null || docs.length == 0) {
-			docs = RestApi.get(
-			"../API/bpm/archivedCaseDocument?p=0&amp;c=25&amp;" 
-			+ "f=archivedCaseId=" + case_id);
+	// renvoie true si le cas dont l'id est case_id est actif 
+	// sinon renvoie false
+	this.isActiveCase = function(case_id) {
+		var case_object = RestApi.get("../API/bpm/case/"+case_id);
+		if(case_object !== null &amp;&amp; case_object.end_date == "") {
+			return true;
 		}
-		return docs;
+		return false;
+	}
+	
+	// renvoie la liste des documents associés à un cas 
+	this.getCaseDocuments = function(case_id) {
+		if(this.isActiveCase(case_id)) {
+			return RestApi.get("../API/bpm/caseDocument?p=0&amp;c=25&amp;f=caseId=" + case_id);
+		}
+		return RestApi.get("../API/bpm/archivedCaseDocument?p=0&amp;c=25&amp;f=archivedCaseId=" + case_id);
 	}
 }
 
 RestApi.Bpm = new BpmObject();
 
-
 function BdmObject() {
 	
-	// renvoie true si il existe deja une note de frais 
-	// pour l'utilisateur et le mois fournis
+	// renvoie true si il existe deja une note de frais pour l'utilisateur et le mois fournis
 	this.hasNoteDeFrais = function(utilisateur, mois, annee) {
-		var ndfs = RestApi.get(
-		"../API/bdm/businessData/com.company.model.NoteDeFrais?q=" 
-		+ "findByMoisAndAnneeComptable" 
-		+ "&amp;p=0&amp;c=1000"
-		+ "&amp;f=anneeComptable=" + annee 
-		+ "&amp;f=moisComptable=" + mois 
-		+ "&amp;f=utilisateur=" + utilisateur);
-		return ndfs !== null && ndfs.length > 0;
+		var ndfs = RestApi.get("../API/bdm/businessData/com.company.model.NoteDeFrais?q=findByMoisAndAnneeComptable&amp;p=0&amp;c=1000&amp;f=anneeComptable=" + annee + "&amp;f=moisComptable=" + mois + "&amp;f=utilisateur=" + utilisateur);
+		return ndfs !== null &amp;&amp; ndfs.length > 0;
 	}
+	
+	// renvoie la liste des années pour lesquelles une note de frais a été déclarée
+	this.anneesNoteDeFrais = function() {
+		return RestApi.get("../API/bdm/businessData/com.company.model.NoteDeFrais?q=findAnneesDisponibles&amp;p=0&amp;c=1000");
+	}
+	
+	// convertie une note de frais renvoyée par l'API Rest en object Javascript
+	// quelques informations supplémentaires sont calculées (e.g. montant total, nom utilisateur, statut)
+	this.creerNoteDeFrais = function(ndf) {
+	
+		function creerElementNoteDeFrais(elem) {
+			var type = elem.type;
+			var montant = elem.montant;
+			var date_depense = elem.dateDepense;
+			var affaire = elem.affaire;
+			var justificatif = elem.justificatif;
+			var affichage_montant = montant +"\u20AC";
+			if(type == "KMS") {
+				var calcul = elem.distance + "km x ";
+				calcul += elem.coutKm  + "\u20AC\\km = ";
+				affichage_montant = calcul + affichage_montant;
+			}
+			return {
+				"type": type,
+				"montant": montant,
+				"date_depense": date_depense,
+				"affaire": affaire,
+				"justificatif": justificatif,
+				"affichage_montant": affichage_montant
+			};
+		}
+	
+		var id_note_de_frais = ndf.persistenceId;
+		var id_utilisateur = ndf.utilisateur;
+		var mois_comptable = ndf.moisComptable;
+		var annee_comptable =ndf.anneeComptable;
+		var commentaires = ndf.commentaires;
+		var commentaires_validateur = ndf.commentairesValidateur;
+		var elems = [];
+		if(ndf.elements !== null) {
+			for(var i = 0; i &lt; ndf.elements.length; i++) {
+				elems.push(creerElementNoteDeFrais(ndf.elements[i]));
+			}
+		}
+		var statut; // le statut de la note de frais (e.g. validée, remboursée)
+		if(ndf.estRemboursee) {
+			statut = "Remboursée";
+		}
+		else if(ndf.estValidee) {
+			statut = "Validée";
+		} else if(ndf.estComplete) {
+			if(ndf.estValidee === null) {
+				statut = "En attente de validation";
+			} else {
+				statut = "En attente de modification";   
+			}
+		} else {
+			statut = "Incomplète";
+		}
+		
+		var montant_total = 0;
+		for(var i = 0; i &lt; elems.length; i++)
+		{
+			montant_total += elems[i].montant;
+		}
+		
+		// utilisation de l'asset pour recuperer les infos utilisateur
+		var user_info = RestApi.Identity.getUser(id_utilisateur);
+		var utilisateur = user_info.firstname + " " + user_info.lastname;
+		
+		return {
+			"id": id_note_de_frais,
+			"id_utilisateur": id_utilisateur,
+			"utilisateur": utilisateur,
+			"mois_comptable": mois_comptable,
+			"mois": mois_comptable,
+			"annee_comptable": annee_comptable,
+			"annee": annee_comptable,
+			"commentaires": commentaires,
+			"commentaires_validateur": commentaires_validateur,
+			"elements": elems,
+			"cas": ndf.cas,
+			"statut": statut,
+			"montant": montant_total,
+			"mois_complet": mois_comptable + " " + annee_comptable
+		};
+	}
+	
+	// mise en cache des notes de frais pour une année donnée.
+	this.notesDeFraisAnnee = new Map();
+	
+	// renvoie la liste de toutes les notes de frais déclarée pour une année donnée
+	this.getNoteDeFraisAnnee = function(annee) {
+		if(annee == null) {
+			return [];
+		}
+	
+		if(this.notesDeFraisAnnee.has(annee)) {
+			return this.notesDeFraisAnnee.get(annee);
+		}
+		
+		var ndfs = RestApi.get("../API/bdm/businessData/com.company.model.NoteDeFrais?q=findByAnneeComptable&amp;p=0&amp;c=1000&amp;f=anneeComptable=" + annee);
+		var result = [];
+		for(var i = 0; i &lt; ndfs.length; i++) {
+			result.push(this.creerNoteDeFrais(ndfs[i]));
+		}
+		
+		this.notesDeFraisAnnee.set(annee, result);
+		return result;
+	}
+	
+	// renvoie la liste des notes de frais correspondant à une année, un mois et un utilisateur
+	// - mois peut valoir "Tous" auquel cas toutes les notes de frais de l'année sont chargées
+	// -utilisateur peut valoir "Tous" (les notes de frais de tous les utilisateurs sont chargées) 
+	// ou null 'seul les notes de frais de l'utilisateur courant sont chargées)
+	this.getNoteDeFraisAnneeMoisUtilisateur = function(annee, mois, utilisateur) {
+		var current_user_id = RestApi.Identity.getCurrentUserId();
+		var result = [];
+		var notes = this.getNoteDeFraisAnnee(annee);
+		for(var i = 0; i &lt; notes.length; i++) {
+			var n = notes[i];
+			if(mois == "Tous" || mois == n.mois) {
+				if(utilisateur == null) {
+					if(n.id_utilisateur == current_user_id) {
+						result.push(n);
+					}
+				} else if(utilisateur == "Tous" || utilisateur == n.utilisateur) {
+					result.push(n);
+				}
+			}
+		}
+		return result;
+	}
+	
+	// renvoie la liste des notes de frais correspondant aux critères de recherche
+	// 'recherche' est une liste de triplet annee-mois-utilisateur
+	// les notes renvoyées sont celles correspondant à au moins un des éléments de 'recherche'
+	this.getNoteDeFrais = function(recherche) {
+		function contientNoteDeFrais(tableau, ndf) {
+			for(var i = 0; i &lt; tableau.length; i++) {
+				if(tableau[i].id == ndf.id) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		var result = [];
+		
+		for(var i = 0; i &lt; recherche.length; i++) {
+			var r = recherche[i];
+			var notes = this.getNoteDeFraisAnneeMoisUtilisateur(r.annee, r.mois, r.utilisateur);
+			for(var j = 0; j &lt; notes.length; j++) {
+				if(!contientNoteDeFrais(result, notes[j])) {
+					result.push(notes[j]);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	// renvoie une liste des noms des utilisateurs ayant complété une note de frais pour l'annee donnée
+	this.utilisateursNoteDeFraisAnnee = function(annee) {
+		var ndfs = this.getNoteDeFraisAnnee(annee);
+		var resultat = [];
+		for(var i = 0; i &lt; ndfs.length; i++) {
+			var ndf = ndfs[i];
+			if(resultat.indexOf(ndf.utilisateur) == -1) {
+				resultat.push(ndf.utilisateur);
+			}
+		}
+		resultat.sort();
+		return ["Tous"].concat(resultat);
+	}
+	
+	
 }
 
-RestApi.Bdm = new BdmObject();
-	</pre>
+RestApi.Bdm = new BdmObject();</pre>
+	</div>
+	</div>
 	</div>
 	
+	</section>
+	
+	<section id="asset.chart">
+	<header>
+		<h2 class="num-section">2.2</h2><h2>Widget GoogleChart</h2><span style="float:right"><a href="#asset.chart"><h2>[asset.chart]</h2></a></span>
+	</header>
+	
 	<p>
-	Cet asset permet notamment :
+	Le widget GoogleChart permet d'utiliser l'API Google Charts pour tracer des graphes. Seul une partie de l'API Google Charts 
+	est accessible via ce widget (seul trois types de graphes sont disponibles).
 	</p>
-	<ul>
-		<li>de faire appel à l'API Rest : <span class="inline-code">RestApi.get()</span> ;</li>
-		<li>de récuperer l'id de l'utilisateur courant : <span class="inline-code">RestApi.Identity.getCurrentUserId()</span> ;</li>
-		<li>de récuperer les pièces jointes liées à une note de frais : <span class="inline-code">RestApi.Bpm.getCaseDocuments()</span> ;</li>
-		<li>de vérifier l'existance d'une note de frais pour un mois comptable donné : <span class="inline-code">RestApi.Bdm.hasNoteDeFrais()</span>.</li>
-	</ul>
+	
+	<p>
+	Ce widget est utilisé dans les applications proposées (cf. <a href="#apps">4</a>).
+	</p>
+	
+	<p>
+	Une documentation de ce widget est également fournie ainsi qu'une page d'exemple.
+	</p>
+	
+	</section>
+
 	
 </section>
 
@@ -726,7 +1026,7 @@ RestApi.Bdm = new BdmObject();
 	<img src="process.png" alt="Image du processus introuvable" title="Image du processus" width="700px"/>
 	
 	<p>
-	Le processus se découpe en plusieurs activités qui seront détailler ci-après. D'une manière globale, 
+	Le processus se découpe en plusieurs activités qui seront détaillées ci-après. D'une manière globale, 
 	le processus se déroule comme suit : l'utilisateur créer une note de frais et peut soit la sauvegarder 
 	soit la soumettre pour validation ; tant que la note de frais n'est pas complète, l'utilisateur peut 
 	la modifier ; lorsque la note de frais passe à l'étape de validation, le validateur peut l'accepter ou 
@@ -761,7 +1061,7 @@ RestApi.Bdm = new BdmObject();
 	
 	<section id="proc.variables">
 		<header>
-			<h2 class="num-section">3.3</h2><h2>Variables et documents</h2><span style="float:right"><a href="#proc.variables"><h2>[proc.activites]</h2></a></span>
+			<h2 class="num-section">3.3</h2><h2>Variables et documents</h2><span style="float:right"><a href="#proc.variables"><h2>[proc.variables]</h2></a></span>
 		</header>
 	
 	<p>
@@ -812,7 +1112,6 @@ RestApi.Bdm = new BdmObject();
 	
 	</section>
 	
-	
 	<section id="proc.activites">
 		<header>
 			<h2 class="num-section">3.4</h2><h2>Activités</h2><span style="float:right"><a href="#proc.activites"><h2>[proc.activites]</h2></a></span>
@@ -823,8 +1122,6 @@ RestApi.Bdm = new BdmObject();
 	sous-parties: la création de la note de frais ; la modification d'une note de frais ; la validation 
 	d'une note de frais ; et la clôture du cas par l'utilisateur l'ayant démarré.
 	</p>
-	
-	</section>
 	
 	<section id="proc.activites.creer">
 		<header>
@@ -960,25 +1257,31 @@ RestApi.Bdm = new BdmObject();
 		Les widgets permettant de choisir le type, de saisir un montant, de sélectionner une date, une affaire 
 		et de rentrer un justificatif font tous 2 colonnes. Les boutons font également tous 2 colonnes. <br/>
 		Les deux widgets permettant de saisir une distance et un coût au kilomètre dans le cas d'un déplacement 
-		en voiture font 1 colonne. Ces widgets sont cachés si le type de l'élément n'est pas "KMS" : 
-		<span class="inline-code">$item.type != "KMS"</span>. <br/>
-		Le widget permettant de saisir un montant est désactivé et caché si le type est "KMS" :
-		<span class="inline-code">$item.type == "KMS"</span>. <br/>
+		en voiture font 1 colonne. Ces widgets sont cachés si le type de l'élément n'est pas "KMS".
+		Le widget permettant de saisir un montant est désactivé et caché si le type est "KMS".
 		Pour l'ensemble de ces widgets, le libellé est masqué.
 		La mention indiquant qu'une note de frais existe déjà est masqué et les boutons permettant de valider 
-		le formulaire sont désactivés si il n'existe pas de note de frais pour le mois sélectionné : 
-		<span class="inline-code">note_de_frais_existante == false</span> où la variable <i>note_de_frais_existante</i> vaut :
+		le formulaire sont activés s'il n'existe pas de note de frais pour le mois sélectionné (variable 
+		<i>note_de_frais_existante</i>).
 		</p>
 		
+		<div class="code-fragment">
+		<div class="nom">note_de_frais_existante</div>
+		<div class="description">Javascript expression</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-creer-var-note_de_frais_existante" />
+		<label for="form-creer-var-note_de_frais_existante">Afficher / Masquer le code</label>
 		<div class="code">
-		<pre>
-var annee = $data.formInput.input_note_de_frais.anneeComptable;
+		<pre>var annee = $data.formInput.input_note_de_frais.anneeComptable;
 var mois = $data.formInput.input_note_de_frais.moisComptable;
 return RestApi.Bdm.hasNoteDeFrais(RestApi.Identity.getCurrentUserId(),
                                   mois, 
                                   annee);
 </pre>
 		</div>
+		</div>
+		</div>
+		
 		
 		</section>
 		
@@ -988,9 +1291,17 @@ return RestApi.Bdm.hasNoteDeFrais(RestApi.Identity.getCurrentUserId(),
 			</header>
 			
 		<p>
-		L'initialisation de la variable métier <i>note_de_frais</i> se fait avec le code suivant :
+		L'initialisation de la variable métier <i>note_de_frais</i> se fait avec un script Groovy. Les différents champs 
+		de l'objet métier <i>note_de_frais</i> sont remplis avec les valeurs fournit par le formulaire ou sont calculés 
+		de manière programmatique.
 		</p>
 
+		<div class="code-fragment">
+		<div class="nom">initialiser_note_de_frais</div>
+		<div class="description">Script</div>
+		<div class="valeur">
+		<input type="checkbox" id="script-initialiser-ndf" />
+		<label for="script-initialiser-ndf">Afficher / Masquer le code</label>
 		<div class="code">
 		<pre>
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -1040,8 +1351,9 @@ for (Map&lt;String,Object> input_entree : input_elements)
 }
 note_de_frais.setElements(elements);
 
-return note_de_frais;
-		</pre>
+return note_de_frais;</pre>
+		</div>
+		</div>
 		</div>
 		
 		<p>
@@ -1071,9 +1383,19 @@ return note_de_frais;
 	doivent quand même apparaître, le commentaire du validateur doit apparaîte pour expliquer la raison du refus à l'utilisateur, le bouton de sauvegarde ne doit pas apparaître.
 	</p>
 	
+		<section id="proc.activites.completer.acteur">
+			<header>
+				<h3 class="num-section">3.4.2.1</h3><h3>Acteur</h3><span style="float:right"><a href="#proc.activites.completer.acteur"><h3>[proc.activites.completer.acteur]</h3></a></span>
+			</header>
+		
+		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seul la personne ayant démarré le cas 
+		(i.e. la personne ayant déclaré la note de frais) peut effectuer cette tâche.</p>
+		
+		</section>
+	
 		<section id="proc.activites.completer.contrat">
 			<header>
-				<h3 class="num-section">3.4.2.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.completer.contrat"><h3>[proc.activites.completer.contrat]</h3></a></span>
+				<h3 class="num-section">3.4.2.2</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.completer.contrat"><h3>[proc.activites.completer.contrat]</h3></a></span>
 			</header>
 		
 		<p>
@@ -1156,7 +1478,7 @@ return note_de_frais;
 	
 		<section id="proc.activites.completer.formulaire">
 			<header>
-				<h3 class="num-section">3.4.2.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.completer.formulaire"><h3>[proc.activites.completer.formulaire]</h3></a></span>
+				<h3 class="num-section">3.4.2.3</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.completer.formulaire"><h3>[proc.activites.completer.formulaire]</h3></a></span>
 			</header>
 		
 		<p>
@@ -1184,23 +1506,79 @@ return note_de_frais;
 		<img src="ui-designer-modifier.png" alt="Image introuvable" width="700px"/>
 		
 		<p>
-		Le téléchargement des pièces jointes se fait avec des widgets <i>Link</i>, en itérant sur la variable 
-		<i>pieces_jointes</i> dont la valeur est
+		Le téléchargement des pièces jointes se fait avec des widgets <i>Link</i>, en itérant sur le tableau 
+		<i>pieces_jointes</i>
 		</p>
 		
+		<div class="code-fragment">
+		<div class="nom">pieces_jointes</div>
+		<div class="description">Javascript expression</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-completer-var-pieces-jointes" />
+		<label for="form-completer-var-pieces-jointes">Afficher / Masquer le code</label>
 		<div class="code">
-		<pre>return $data.context.pieces_jointes_ref;</pre>
+		<pre>return $data.context.pieces_jointes_ref; </pre>
+		</div>
+		</div>
 		</div>
 		
 		<p>
 		Le texte des liens vaut <br/> <span class="inline-code">Télécharger  {{$item.fileName}}</span> <br/> et 
 		l'URL cible<br/> <span class="inline-code">"/bonita/portal/"+$item.url</span>.
+		</p>
+		
+		<p>
+		Les boutons <i>Sauvegarder</i> et <i>Soumettre</i> ne sont activés que si les informations obligatoires 
+		ont toutes été fournies (variable <i>note_completee</i>). Pour que le bouton <i>Sauvegarder</i> soit 
+		actif, il faut également que la note n'est jamais été soumise à validation (i.e. le champ 
+		<i>estCompletee</i> de la note de frais vaut false).
+		</p>
+		
+		<div class="code-fragment">
+		<div class="nom">note_completee</div>
+		<div class="description">Javascript expression</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-completer-var-note_completee" />
+		<label for="form-completer-var-note_completee">Afficher / Masquer le code</label>
+		<div class="code">
+		<pre>
+var elems = $data.noteDeFrais.elements;
+for(var i = 0; i &lt; elems.length; i++) {
+    var e = elems[i];
+    
+    if(e == null) {
+        return false;
+    }
+    
+    if(e.type == null) {
+        return false;
+    }
+    
+    if(e.type == "KMS") {
+        if(e.coutKm == null || e.distance == null) {
+            return false;
+        }
+    } else {
+        if(e.montant == null) {
+            return false;
+        }
+    }
+    
+    if(e.dateDepense == null || e.affaire == null) {
+        return false;
+    }
+}
+
+return true;</pre>
+		</div>
+		</div>
+		</div>
 		
 		</section>
 		
 		<section id="proc.activites.completer.ops">
 			<header>
-				<h3 class="num-section">3.4.2.3</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.completer.ops"><h3>[proc.activites.completer.ops]</h3></a></span>
+				<h3 class="num-section">3.4.2.4</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.completer.ops"><h3>[proc.activites.completer.ops]</h3></a></span>
 			</header>
 			
 		<p>
@@ -1209,9 +1587,18 @@ return note_de_frais;
 		</p>
 		
 		<p>
-		La mise à jour de la note de frais se fait avec le code suivant :
+		La mise à jour de la note de frais se fait avec un script Groovy. Les nouveaux éléments de la note de frais sont 
+		ajoutés à la liste des anciens éléments. Les éléments supprimés qui faisaient partit de la liste des anciens 
+		éléments sont retirés. Les anciennes pièces jointes et les nouvelles sont regroupées dans la nouvelle liste des 
+		pièces jointes.
 		</p>
 		
+		<div class="code-fragment">
+		<div class="nom">modifier_note_de_frais</div>
+		<div class="description">Script</div>
+		<div class="valeur">
+		<input type="checkbox" id="script-modifier-ndf" />
+		<label for="script-modifier-ndf">Afficher / Masquer le code</label>
 		<div class="code">
 		<pre>
 import com.company.model.NoteDeFrais;
@@ -1281,13 +1668,18 @@ note_de_frais.setElements(elements);
 
 return note_de_frais;</pre>
 		</div>
+		</div>
+		</div>
 		
-	<p>
-	L'ajout de pièces jointes se fait avec le code suivant :
-	</P>
-	
-	<div class="code">
-	<pre>
+		
+		<div class="code-fragment">
+		<div class="nom">maj_pieces_jointes</div>
+		<div class="description">Script</div>
+		<div class="valeur">
+		<input type="checkbox" id="script-maj_pieces_jointes" />
+		<label for="script-maj_pieces_jointes">Afficher / Masquer le code</label>
+		<div class="code">
+		<pre>
 import org.bonitasoft.engine.bpm.contract.FileInputValue
 import org.bonitasoft.engine.bpm.document.Document
 import org.bonitasoft.engine.bpm.document.DocumentValue
@@ -1315,17 +1707,19 @@ resultat.addAll(form_pieces_jointes);
 
 
 return resultat;</pre>
-	</div>
-	
-	<p>
-	<i>Remarque </i> :Ce code utilise des fonctionnalités de Bonita peut documenter et il faudra peut-être 
-	faire quelque rechercher pour vérifier qu'il fonctionne bien.
-	</p>
+		</div>
+		</div>
+		</div>
+			
 		
+		<p>
+		<i>Remarque </i> : le code utilisé pour mettre à jour les pièces jointes utilise des fonctionnalités de Bonita 
+		peu documentée et il faudra peut-être faire quelque rechercher pour vérifier qu'il fonctionne bien.
+		</p>
+			
 		</section>
 	
 	</section>
-	
 	
 	<section id="proc.activites.valider">
 		<header>
@@ -1382,6 +1776,12 @@ return resultat;</pre>
 		
 		<img src="form_valider.png" alt="Image du formulaire introuvable" title="Image du formulaire de validation de note de frais" width="700px"/>
 		
+		<p>
+		Le formulaire est créer dans le UI-Designer de Bonita de la manière suivante.
+		</p>
+		
+		<img src="ui-designer-valider.png" alt="Image du formulaire introuvable" title="Image du formulaire de validation de note de frais" width="700px"/>
+		
 		</section>
 		
 		<section id="proc.activites.valider.ops">
@@ -1391,12 +1791,17 @@ return resultat;</pre>
 			
 		<p>
 		Les champs <i>estValidee</i>, <i>dateValidation</i> et <i>commentairesValidateur</i> de la note
-		de frais doivent être mis à jour. Les champs <i>acceptee</i> de chaque éléments de la note de 
-		frais doivent également être modifiés.
+		de frais doivent être mis à jour.
 		</p>
 		
-	<div class="code">
-	<pre>
+		<div class="code-fragment">
+		<div class="nom">maj_note_de_frais</div>
+		<div class="description">Script</div>
+		<div class="valeur">
+		<input type="checkbox" id="script-maj_note_de_frais" />
+		<label for="script-maj_note_de_frais">Afficher / Masquer le code</label>
+		<div class="code">
+		<pre>
 import com.company.model.NoteDeFrais;
 
 note_de_frais.setEstValidee(form_note_de_frais_validee);
@@ -1406,40 +1811,66 @@ if(form_note_de_frais_validee)
 	note_de_frais.setDateValidation(new Date());
 }
 
-return note_de_frais;
-</pre>
-	</div>
+return note_de_frais;</pre>
+		</div>
+		</div>
+		</div>
+		
 		
 		</section>
 	
 	</section>
-	
-
-	
-	<section id="proc.activites.terminer">
+		
+	<section id="proc.activites.confirmer">
 		<header>
-			<h3 class="num-section">3.4.4</h3><h3>Terminer le processus</h3><span style="float:right"><a href="#proc.activites.terminer"><h3>[proc.activites.terminer]</h3></a></span>
+			<h3 class="num-section">3.4.4</h3><h3>Confirmer le remboursement</h3><span style="float:right"><a href="#proc.activites.confirmer"><h3>[proc.activites.confirmer]</h3></a></span>
 		</header>
 	
 	<p>
 	Dans cette activité, la personne ayant déclaré la note de frais clôt le cas en confirmant avoir 
-	bien reçut le remboursement.
+	bien reçut le remboursement. Si elle n'a pas reçut le remboursement elle peut quitter la page en fermant 
+	l'onglet de son navigateur ou cliquer sur le bouton <i>Je n'ai pas encore été remboursé</i>.
 	</p>
 	
-		<section id="proc.activites.terminer.contrat">
+		<section id="proc.activites.confirmer.acteur">
 			<header>
-				<h3 class="num-section">3.4.4.1</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.terminer.contrat"><h3>[proc.activites.terminer.contrat]</h3></a></span>
+				<h3 class="num-section">3.4.4.1</h3><h3>Acteur</h3><span style="float:right"><a href="#proc.activites.confirmer.acteur"><h3>[proc.activites.confirmer.acteur]</h3></a></span>
 			</header>
 		
-		<p>
-		Le contrat pour cette activité est vide.
-		</p>
+		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seul la personne ayant démarré le cas 
+		(i.e. la personne ayant déclaré la note de frais) peut effectuer cette tâche.</p>
 		
 		</section>
 	
-		<section id="proc.activites.terminer.formulaire">
+		<section id="proc.activites.confirmer.contrat">
 			<header>
-				<h3 class="num-section">3.4.4.2</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.terminer.formulaire"><h3>[proc.activites.terminer.formulaire]</h3></a></span>
+				<h3 class="num-section">3.4.4.2</h3><h3>Contrat</h3><span style="float:right"><a href="#proc.activites.confirmer.contrat"><h3>[proc.activites.confirmer.contrat]</h3></a></span>
+			</header>
+		
+		<p>
+		Le contrat est constitué d'une unique variable indiquant si l'utilisateur à bien été remboursé.
+		</p>
+		
+		<table class="contrat">
+			<tbody>
+				<tr class="entete">
+					<td>Nom</td>
+					<td>Type</td>
+					<td>Multiple</td>
+				</tr>
+				<tr>
+					<td>confirmation</td>
+					<td>BOOLEAN</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+		
+		</section>
+	
+		<section id="proc.activites.confirmer.formulaire">
+			<header>
+				<h3 class="num-section">3.4.4.3</h3><h3>Formulaire</h3><span style="float:right"><a href="#proc.activites.confirmer.formulaire"><h3>[proc.activites.confirmer.formulaire]</h3></a></span>
 			</header>
 			
 		<p>
@@ -1449,21 +1880,54 @@ return note_de_frais;
 		un responsable quelconque et une fois le problème régler appuyer sur le bouton.
 		</p>
 		
+		<img src="form_confirmer.png" alt="Image du formulaire introuvable" title="Image du formulaire de confirmation" width="700px"/>
+
+		<p>
+		Mise en place dans le UI-Designer :
+		</p>
+		
+		<img src="ui-designer-confirmer.png" alt="Image du formulaire introuvable" title="Image du formulaire de confirmation dans le UI-Designer" width="700px"/>
+		
+		<div class="code-fragment">
+		<div class="nom">montant_total</div>
+		<div class="description">Javascript expression</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-completer-var-montant_total" />
+		<label for="form-completer-var-montant_total">Afficher / Masquer le code</label>
+		<div class="code">
+		<pre>
+if(!angular.isDefined($data.noteDeFrais)) {
+    return 0;
+}
+
+var montant = 0;
+
+for(var i = 0; i &lt; $data.noteDeFrais.elements.length; i++) {
+    montant += $data.noteDeFrais.elements[i].montant;
+}
+
+return montant;</pre>
+		</div>
+		</div>
+		</div>
+		
 		</section>
 		
-		<section id="proc.activites.terminer.ops">
+		<section id="proc.activites.confirmer.ops">
 			<header>
-				<h3 class="num-section">3.4.4.3</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.terminer.ops"><h3>[proc.activites.terminer.ops]</h3></a></span>
+				<h3 class="num-section">3.4.4.4</h3><h3>Opérations</h3><span style="float:right"><a href="#proc.activites.confirmer.ops"><h3>[proc.activites.confirmer.ops]</h3></a></span>
 			</header>
 			
 		<p>
-		Il n'y a aucune opération a effectuer pour cette activité.
+		Le champ <i>estRemboursee</i> de la variable <i>note_de_frais</i> est mis à la valeur <i>confirmation</i> fournie par le contrat. 
+		La méthode Java <i>setEstRemboursee</i> est utilisée.
 		</p>
 		
 		</section>
 	
 	</section>
-	
+		
+	</section>
 	
 </section>
 
@@ -1477,7 +1941,7 @@ return note_de_frais;
 	Deux applications sont proposées : la première permet à un utilisateur de consulter l'ensemble de 
 	ses notes de frais ; la seconde permet à un administrateur de consulter l'ensemble des notes 
 	de frais des utilisateurs. <br/> 
-	Chacune des deux applications présentés est contistué d'une unique page.
+	Chacune des deux applications présentées est contistuée d'une unique page.
 	</p>
 	
 	<section id="apps.notes">
@@ -1485,36 +1949,37 @@ return note_de_frais;
 			<h1 class="num-section">4.1</h1><h1>Mes notes de frais</h1><span style="float:right"><a href="#apps.notes"><h1>[apps.notes]</h1></a></span>
 		</header>
 		
-		<b>Cette application est encore en developpement.....</b>
-		
 		<p>
 		L'application <i>Mes notes de frais</i> permet à un utilisateur de consulter l'ensemble de 
 		ses notes de frais et d'en extraire quelques statisitques. <br/>
-		L'image suivante donne un aperçu de la mise en page possible (les nombres sont incorrects 
-		car fictifs).
 		</p>
 		
-		<img src="apps-notes.png" width="700px" alt="Image application introuvable" title="Page - Mes notes de frais"/>
-		
+		<img src="apps-mes-notes.png" width="700px" alt="Image application introuvable" title="Page - Mes notes de frais"/>
 		
 		<p>
-		L'ensemble des notes de frais de l'utilisateur est affiché dans un tableau indiquant le mois 
-		comptable, le montant total de la note de frais et le statut de la note de frais. <br/>
-		Quatres statuts sont possibles :
+		La mise en page dans le UI-Designer est faite de la manière suivante :
+		</p>
+		
+		<img src="ui-designer-page-mes-notes.png" width="700px" alt="Image application introuvable" title="UI-Designer | Page - Mes notes de frais"/>
+
+		<p>
+		Dans la première partie de la page, l'utilisateur est amenée à définir un ou plusieurs critères de recherche. 
+		Un critère de recherche est définie par une année et éventuellement un mois. Seules les notes répondant à un critère 
+		sont affichées.
+		</p>
+		
+		<p>
+		L'ensemble des notes de frais de l'utilisateur répondant à au moins un des critères de recherche est affiché dans 
+		un tableau indiquant le mois comptable, le montant total de la note de frais et le statut de la note de frais. <br/>
+		Cinqs statuts sont possibles :
 		</p>
 		<ul>
 			<li><i>Validée</i> : la note de frais est validée</li>
 			<li><i>En attente de validation</i> : la note de frais est complète et doit être validée</li>
 			<li><i>En attente de modification</i> : la note de frais est complète mais n'a pas passé l'étape de validation et doit être modifiée</li>
 			<li><i>Incomplète</i> : la note de frais est incomplète et n'a pas encore été soumise à validation</li>
+			<li><i>Remboursée</i> : l'utilisateur a confirmé le remboursement de la note de frais</li>
 		</ul>
-		
-		<p>
-		L'utilisateur peut s'il le veut filtrer la liste des résultats en sélectionnant une année dans 
-		la liste déroulante au sommet de la page. <br/>
-		Cette liste déroulante ne devra proposer que des années pour lesquelles il existe au moins une 
-		note de frais.
-		</p>
 
 		<p>
 		Lorsqu'une note de frais est sélectionnée dans le tableau, son détail s'affiche en dessous du 
@@ -1530,9 +1995,7 @@ return note_de_frais;
 		<p>
 		Le montant des dépenses par catégories est calculé et affiché. L'utilisateur peut filtrer 
 		d'avantage l'ensemble des notes sur lequel les calculs sont effectués en sélectionnant une 
-		affaire dans la liste déroulante. Une fois de plus, la liste déroulante ne doit proposer que 
-		des affaires pour lesquels une note de frais existe pour l'utilisateur et pour l'année 
-		sélectionnée.
+		affaire dans la liste déroulante.
 		</p>
 		
 		<p>
@@ -1557,8 +2020,8 @@ return note_de_frais;
 		
 		<p>
 		L'application fonctionne de la même manière que celle fournit pour l'utilisateur à la différence 
-		que l'administrateur peut filtrer les résultats selon une année, un mois et un utilisateur et 
-		que le nom de l'utilisateur ayant déclaré la note de frais est affiché dans le tableau.
+		que l'administrateur peut filtrer les résultats selon une année, un mois et un utilisateur. 
+		Le nom de l'utilisateur ayant déclarée la note est également affiché dans le tableau.
 		</p>
 		
 		<p>
@@ -1567,227 +2030,7 @@ return note_de_frais;
 		
 		<img src="ui-designer-page-gestion-notes.png" width="700px" alt="Image application introuvable" title="UI-Designer Page - Gestion des notes de frais"/>
 		
-		<p>
-		Les variables utilisées pour le formulaire sont listés ci-dessous.
-		</p>
-		
-		<div class="variable-formulaire">
-		<div class="nom">annees_disponibles</div>
-		<div class="description">Renvoie la liste des années pouvant être utilisées pour filtrer les notes de frais</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-gestion-code-annees_disponibles" />
-		<label for="form-gestion-code-annees_disponibles">Afficher / Masquer le code</label>
-		<div class="code">
-<pre>var resultat = ["Toutes"];
-
-if(!angular.isDefined($data.notes_de_frais)) {
-    return resultat;
-}
-
-for(var i = 0; i &lt; $data.notes_de_frais.length; i++)
-{
-    if(resultat.indexOf($data.notes_de_frais[i].annee_comptable) == -1) {
-        resultat.push($data.notes_de_frais[i].annee_comptable);
-    }
-}
-
-return resultat;</pre>
-		</div>
-		</div>
-		</div>
-		
-		
-		<div class="variable-formulaire">
-		<div class="nom">formulaire</div>
-		<div class="description">Variable utilisée pour récupérer les données rentrées par l'utilisateur</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-gestion-code-formulaire" />
-		<label for="form-gestion-code-formulaire">Afficher / Masquer le code</label>
-		<div class="code">
-<pre>{
-    "annee": null, 
-    "mois": null, 
-    "utilisateur": null,
-    "affaire": null,
-    "categorie": null,
-    "note_de_frais": null
-}</pre>
-		</div>
-		</div>
-		</div>
-		
-		
-		<div class="variable-formulaire">
-		<div class="nom">note_de_frais_filtrees</div>
-		<div class="description">Variable utilisée pour récupérer les données rentrées par l'utilisateur</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-gestion-code-note_de_frais_filtrees" />
-		<label for="form-gestion-code-note_de_frais_filtrees">Afficher / Masquer le code</label>
-		<div class="code">
-<pre>if(!angular.isDefined($data.notes_de_frais)) {
-    return [];
-}
-
-
-var resultat = [];
-
-var predicat = function(ndf) {
-    var annee_selectionnee = $data.formulaire.annee;
-    if(annee_selectionnee !== null &amp;&amp; annee_selectionnee != "Toutes") {
-        if(ndf.annee_comptable != annee_selectionnee) {
-            return false;
-        }
-    }
-    
-    var mois_selectionne = $data.formulaire.mois;
-    if(mois_selectionne !== null &amp;&amp; mois_selectionne != "Tous") {
-        if(ndf.mois_comptable != mois_selectionne) {
-            return false;
-        }
-    }
-    
-    var utilisateur = $data.formulaire.utilisateur;
-    if(utilisateur !== null &amp;&amp; utilisateur != "Tous") {
-        if(ndf.utilisateur != utilisateur) {
-            return false;
-        }
-    }
-    
-    return true;
-};
-
-for(var i = 0; i &lt; $data.notes_de_frais.length; i++)
-{
-    if(predicat($data.notes_de_frais[i]))
-    {
-        resultat.push($data.notes_de_frais[i]);
-    }
-}
-
-return resultat;</pre>
-		</div>
-		</div>
-		</div>
-		
-		
-		<div class="variable-formulaire">
-		<div class="nom">notes_de_frais</div>
-		<div class="description">Liste des notes de frais</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-gestion-code-notes_de_frais" />
-		<label for="form-gestion-code-notes_de_frais">Afficher / Masquer le code</label>
-		<div class="code">
-<pre>
-var creerElementNoteDeFrais = function(elem) {
-    var type = elem.type;
-    var montant = elem.montant;
-    var date_depense = elem.dateDepense;
-    var affaire = elem.affaire;
-    var justificatif = elem.justificatif;
-    var affichage_montant = montant +"\u20AC";
-    if(type == "KMS") {
-        var calcul = elem.distance + "km x ";
-        calcul += elem.coutKm  + "\u20AC\\km = ";
-        affichage_montant = calcul + affichage_montant;
-    }
-    return {
-        "type": type,
-        "montant": montant,
-        "date_depense": date_depense,
-        "affaire": affaire,
-        "justificatif": justificatif,
-        "affichage_montant": affichage_montant
-    };
-};
-
-var creerNoteDeFrais = function(ndf) {
-    var id_note_de_frais = ndf.persistenceId;
-    var id_utilisateur = ndf.utilisateur;
-    var mois_comptable = ndf.moisComptable;
-    var annee_comptable =ndf.anneeComptable;
-    var commentaires = ndf.commentaires;
-    var commentaires_validateur = ndf.commentairesValidateur;
-    var elems = [];
-    if(ndf.elements !== null) {
-        for(var i = 0; i &lt; ndf.elements.length; i++) {
-            elems.push(creerElementNoteDeFrais(ndf.elements[i]));
-        }
-    }
-    var statut;
-    if(ndf.estValidee) {
-        statut = "Validée";
-    } else if(ndf.estComplete) {
-        if(ndf.estValidee === null) {
-            statut = "En attente de validation";
-        } else {
-            statut = "En attente de modification";   
-        }
-    } else {
-        statut = "Incomplète";
-    }
-    
-    var montant_total = 0;
-    for(var i = 0; i &lt; elems.length; i++)
-    {
-        montant_total += elems[i].montant;
-    }
-    
-    // utilisation de l'asset pour recuperer les infos utilisateur
-    var user_info = RestApi.Identity.getUser(id_utilisateur);
-    var utilisateur = user_info.firstname + " " + user_info.lastname;
-    
-    return {
-        "id": id_note_de_frais,
-        "id_utilisateur": id_utilisateur,
-        "utilisateur": utilisateur,
-        "mois_comptable": mois_comptable,
-        "annee_comptable": annee_comptable,
-        "commentaires": commentaires,
-        "commentaires_validateur": commentaires_validateur,
-        "elements": elems,
-        "cas": ndf.cas,
-        "statut": statut,
-        "montant": montant_total,
-        "mois_complet": mois_comptable + " " + annee_comptable
-    };
-};
-
-if(!angular.isDefined($data.requete_notes_de_frais)) {
-    return [];
-}
-
-var resultat = [];
-for(var i = 0; i &lt; $data.requete_notes_de_frais.length; i++) {
-	resultat.push(creerNoteDeFrais($data.requete_notes_de_frais[i]));
-}
-return resultat;</pre>
-		</div>
-		</div>
-		</div>
-		
-		
-		<div class="variable-formulaire">
-		<div class="nom">pieces_jointes_note_selectionnee</div>
-		<div class="description">Liste des pièces jointes de la note de frais sélectionnée</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-gestion-code-pieces_jointes_note_selectionnee" />
-		<label for="form-gestion-code-pieces_jointes_note_selectionnee">Afficher / Masquer le code</label>
-		<div class="code">
-<pre>if($data.formulaire.note_de_frais === null) {
-    return {};
-}
-
-if($data.formulaire.note_de_frais.cas === null) {
-    return {};
-}
-
-// utilisation de l'asset pour récuperer les pieces jointes
-return RestApi.Bpm.getCaseDocuments($data.formulaire.note_de_frais.cas);</pre>
-		</div>
-		</div>
-		</div>
-		
-		<p><b>liste à compléter...</b></p>
+	
 		
 	</section>
 	
@@ -1805,8 +2048,37 @@ return RestApi.Bpm.getCaseDocuments($data.formulaire.note_de_frais.cas);</pre>
 	</p>
 	<p>
 	Chaque formulaire contient ainsi une variable <i>liste_affaires</i> qu'il faudra modifier pour qu'elle 
-	renvoie la liste des affaires à proposer.
+	renvoie la liste des affaires à proposer. On pourra par exemple utiliser une requête spécifique pour l'objet 
+	métier <i>Affaire</i> renvoyant une liste des affaires non terminées.
 	</p>
+	
+	<div class="code-fragment">
+	<div class="nom">Exemple de solution : findAffaireNonTerminee</div>
+	<div class="description">Requête spécifique</div>
+	<div class="valeur">
+	<input type="checkbox" id="integ-exemple" />
+	<label for="integ-exemple">Afficher / Masquer le code</label>
+	<div class="code">
+	<pre>
+SELECT a.nom
+FROM Affaire a
+WHERE a.estTerminee = false</pre>
+	</div>
+	</div>
+	</div>
+		
+	<div class="code-fragment">
+	<div class="nom">Appel à l'API Rest associé</div>
+	<div class="description">URL</div>
+	<div class="valeur">
+	<input type="checkbox" id="integ-req-restapi" />
+	<label for="integ-req-restapi">Afficher / Masquer le code</label>
+	<div class="code">
+	<pre>../API/bdm/businessData/com.company.model.Affaire?q=findAffaireNonTerminee&amp;p=0&amp;c=1000</pre>
+	</div>
+	</div>
+	</div>
+		
 	
 </section>
 
