@@ -154,7 +154,7 @@ input:checked ~ .code {
 Ce document fournit une description détaillée de l'implémentation dans Bonita BPM 7.1.5 
 du processus de gestion des notes de frais ainsi que des applications associées. <br/>
 Il contient en outre une partie relative à l'intégration du processus dans l'ensemble 
-des processus de Wise IT.
+des processus de Wise IT Conseil.
 </p>
 </div>
 
@@ -300,7 +300,7 @@ des processus de Wise IT.
 	différentes applications. Après une présentation du processus dans son ensemble, les différentes 
 	activités sont décrites. Les contrats, formulaires et opérations à effectuer sont brièvement présentés 
 	pour chaque activité. <br/>
-	Enfin, deux applications sont proposés pour compléter le processus. <br/>
+	Enfin, deux applications sont proposées pour compléter le processus. <br/>
 	La dernière section concerne le déploiement du processus.
 	</p>
 	
@@ -318,16 +318,16 @@ des processus de Wise IT.
 
 		<p>
 		Cette section décrit les objets métiers utlisés lors du processus de déclaration d'une note de 
-		frais. Les objets métiers décrit sont <i>ElementNoteDeFrais</i> et <i>NoteDeFrais</i>. Le premier 
+		frais. Les objets métiers décrits sont <i>ElementNoteDeFrais</i> et <i>NoteDeFrais</i>. Le premier 
 		correspond à un élément d'une note de frais et contient notamment le montant de la dépense, le 
-		second correspond à la note de frais en elle-même et contient l'ensemble des éléments de la note 
-		de frais ainsi que le mois comptable de la note de frais. <br/>
+		second correspond à la note de frais en elle-même et contient l'ensemble de ses éléments, ainsi 
+		que le mois comptable qu'elle couvre. <br/>
 		</p>
 		
 		<p>
-		La convention <a href="https://fr.wikipedia.org/wiki/CamelCase">CamelCase</a> est utilisé pour les 
-		objets métiers pour rester cohérent avec les conventions utilisés en Java. <br/>
-		Dans les autres cas, si possible, les noms sont écrits en miniscule avec un underscore comme séparateur.
+		La convention <a href="https://fr.wikipedia.org/wiki/CamelCase">CamelCase</a> est utilisée pour les 
+		objets métiers afin de rester cohérent avec les conventions utilisées en Java. <br/>
+		Dans les autres cas, si possible, les noms sont écrits en minuscule avec un underscore (le caractère  _ ) comme séparateur.
 		</p>
 		
 	</section>
@@ -396,15 +396,15 @@ des processus de Wise IT.
 		</table>
 		
 		<p>
-		<i>Remarque </i>: La colonne <i>Multiple</i> de <i>Bonita</i> n'est pas précisé ici car tous les 
-		il vaut <i>false</i> pour tous les éléments.
+		<i>Remarque </i>: La colonne <i>Multiple</i> de <i>Bonita</i> n'est pas représentée ici car 
+		elle vaut <i>false</i> pour tous les éléments.
 		</p>
 		
 		<p>
-		Le champ <i>type</i> représente le type de la dépense. Sa valeur doit être parmi :
+		Le champ <i>type</i> représente le type de la dépense. Sa valeur doit être parmi:
 		</p>
 		<ul>
-			<li>Hotel</li>
+			<li>Hôtel</li>
 			<li>Repas</li>
 			<li>Parking</li>
 			<li>Taxi</li>
@@ -435,9 +435,9 @@ des processus de Wise IT.
 		</p>
 		
 		<p>
-		<i>Remarque </i>: On aurait pu donner au champ <i>numeroJustificatif</i> le type <i>INTEGER</i> 
-		mais cela aurait été réducteur. Le type <i>STRING</i> permettra de donner des indications 
-		beaucoup plus large comme "Pièce-jointe 1 page 2" tout en permettant toujours de donner un simple 
+		<i>Remarque </i>: On aurait pu donner au champ <i>numeroJustificatif</i> le type <i>INTEGER</i>,
+		mais le type <i>STRING</i> permet de donner des indications 
+		beaucoup plus larges comme "Pièce-jointe 1 page 2" tout en autorisant aussi de donner un simple 
 		numéro.
 		</p>
 		
@@ -556,13 +556,13 @@ des processus de Wise IT.
 		</table>
 		
 		<p>
-		Le champ <i>utilisateur</i> représente l'identifiant de l'utilisateur ayant créer la note de frais.
+		Le champ <i>utilisateur</i> représente l'identifiant de l'utilisateur ayant créé la note de frais.
 		</p>
 		
 		<p>
 		Les champs <i>moisComptable</i> et <i>anneeComptable</i> servent à identifier le mois comptable 
-		pour la note de frais. Un utilisateur donné ne peut créer qu'une seule note de frais pour un mois 
-		comptable donné.
+		pour la note de frais. Un utilisateur donné ne peut créer qu'une seule note de frais par mois 
+		comptable.
 		</p>
 		
 		<p>
@@ -572,7 +572,7 @@ des processus de Wise IT.
 
 		<p>
 		Les champs <i>commentaires</i> et <i>commentairesValidateur</i> sont utilisés pour les 
-		commentaires de l'utilisateur déclarant sa note de frais et pour le validateur.
+		commentaires de l'utilisateur déclarant sa note de frais et pour ceux du validateur.
 		</p>
 		
 		<p>
@@ -586,7 +586,7 @@ des processus de Wise IT.
 		</p>
 		
 		<p>
-		Les différents éléments de la note de frais son stockés dans le champ <i>elements</i>.
+		Les différents éléments de la note de frais sont stockés dans le champ <i>elements</i>.
 		</p>
 		
 		<p>
@@ -602,7 +602,7 @@ des processus de Wise IT.
 			
 			<p>
 			Pour faciliter l'utilisation de l'objet métier <i>NoteDeFrais</i> dans les pages et formulaires et pour diminuer 
-			la charge de travail du côté client, nous définissons des reqûetes personnalisées dans Bonita (onglet <i>Requêtes</i> 
+			la charge de travail côté client, nous définissons des requêtes personnalisées dans Bonita (onglet <i>Requêtes</i> 
 			puis bouton radio <i>Spécifiques</i> dans la fenêtre de gestion du modèle de données métier).
 			</p>
 			
@@ -630,7 +630,7 @@ ORDER BY n.persistenceId ASC</pre>
 			
 			<p>
 			Le deuxième requête que nous définissons s'appelle <i>findAnneesDisponibles</i> et permet de récupérer la liste des années 
-			pour lesquelles une note de frais au moins a été déclarée.
+			pour lesquelles au moins une note de frais a été déclarée.
 			</p>
 			
 			<div class="code-fragment">
@@ -660,7 +660,7 @@ ORDER BY anneeComptable ASC</pre>
 	
 	<p>
 	Les formulaires et pages créés utilisent un asset Javascript permettant d'accéder plus facilement 
-	à l'API Rest et de limiter le nombre de variable à créer dans chaque formulaire. Ils utilisent également 
+	à l'API Rest et de limiter le nombre de variables à créer dans chaque formulaire. Ils utilisent également 
 	un widget personnalisé permettant de dessiner des graphes.
 	</p>
 	
@@ -670,7 +670,7 @@ ORDER BY anneeComptable ASC</pre>
 	</header>
 
 	<p>
-	L'asset RestApi permet de faire appel à l'API REST depuis un script Javascript. La mise en cache de certain résultat permet 
+	L'asset RestApi permet de faire appel à l'API REST depuis un script Javascript. La mise en cache de certains résultats permet 
 	d'accélerer grandement l'affichage des pages et de réduire la charge côté serveur.
 	</p>
 	
@@ -681,7 +681,7 @@ ORDER BY anneeComptable ASC</pre>
 		<li>de faire appel à l'API Rest : <span class="inline-code">RestApi.get()</span> ;</li>
 		<li>de récuperer l'id de l'utilisateur courant : <span class="inline-code">RestApi.Identity.getCurrentUserId()</span> ;</li>
 		<li>de récuperer les pièces jointes liées à une note de frais : <span class="inline-code">RestApi.Bpm.getCaseDocuments()</span> ;</li>
-		<li>de vérifier l'existance d'une note de frais pour un mois comptable donné : <span class="inline-code">RestApi.Bdm.hasNoteDeFrais()</span>.</li>
+		<li>de vérifier l'existence d'une note de frais pour un mois comptable donné : <span class="inline-code">RestApi.Bdm.hasNoteDeFrais()</span>.</li>
 		<li>de récuperer les notes de frais pour une année donnée : <span class="inline-code">RestApi.Bdm.getNoteDeFraisAnnee()</span>.</li>
 		<li>de récuperer les notes de frais pour une année, un mois et un utilisateur donnés : <span class="inline-code">RestApi.Bdm.getNoteDeFraisAnneeMoisUtilisateur()</span>.</li>
 		<li>de récuperer les notes de frais répondant à un critère de recherche donné (utilisé dans les applications) : <span class="inline-code">RestApi.Bdm.getNoteDeFrais()</span>.</li>
@@ -752,12 +752,12 @@ function IdentityObject() {
 		return user;
 	}
 	
-	// renvoie l'objet representant l'utilisateur courant
+	// renvoie l'objet representant l'utilisateur actuel
 	this.getCurrentUser = function() {
 		return RestApi.get("../API/system/session/unusedid");
 	}
 	
-	// renvoie l'id de l'utilisateur courant
+	// renvoie l'id de l'utilisateur actuel
 	this.getCurrentUserId = function() {
 		var current_user = this.getCurrentUser();
 		if(current_user != null) {
@@ -773,7 +773,7 @@ RestApi.Identity = new IdentityObject();
 function BpmObject() {
 	
 	// renvoie true si le cas dont l'id est case_id est actif 
-	// sinon renvoie false
+	// sinon, renvoie false
 	this.isActiveCase = function(case_id) {
 		var case_object = RestApi.get("../API/bpm/case/"+case_id);
 		if(case_object !== null &amp;&amp; case_object.end_date == "") {
@@ -795,7 +795,7 @@ RestApi.Bpm = new BpmObject();
 
 function BdmObject() {
 	
-	// renvoie true si il existe deja une note de frais pour l'utilisateur et le mois fournis
+	// renvoie true s'il existe deja une note de frais pour l'utilisateur et le mois fournis
 	this.hasNoteDeFrais = function(utilisateur, mois, annee) {
 		var ndfs = RestApi.get("../API/bdm/businessData/com.company.model.NoteDeFrais?q=findByMoisAndAnneeComptable&amp;p=0&amp;c=1000&amp;f=anneeComptable=" + annee + "&amp;f=moisComptable=" + mois + "&amp;f=utilisateur=" + utilisateur);
 		return ndfs !== null &amp;&amp; ndfs.length > 0;
@@ -806,7 +806,7 @@ function BdmObject() {
 		return RestApi.get("../API/bdm/businessData/com.company.model.NoteDeFrais?q=findAnneesDisponibles&amp;p=0&amp;c=1000");
 	}
 	
-	// convertie une note de frais renvoyée par l'API Rest en object Javascript
+	// convertit une note de frais renvoyée par l'API Rest en object Javascript
 	// quelques informations supplémentaires sont calculées (e.g. montant total, nom utilisateur, statut)
 	this.creerNoteDeFrais = function(ndf) {
 	
@@ -888,10 +888,10 @@ function BdmObject() {
 		};
 	}
 	
-	// mise en cache des notes de frais pour une année donnée.
+	// mise en cache des notes de frais pour une annee donnee.
 	this.notesDeFraisAnnee = new Map();
 	
-	// renvoie la liste de toutes les notes de frais déclarée pour une année donnée
+	// renvoie la liste de toutes les notes de frais déclarees pour une annee donnee
 	this.getNoteDeFraisAnnee = function(annee) {
 		if(annee == null) {
 			return [];
@@ -912,9 +912,9 @@ function BdmObject() {
 	}
 	
 	// renvoie la liste des notes de frais correspondant à une année, un mois et un utilisateur
-	// - mois peut valoir "Tous" auquel cas toutes les notes de frais de l'année sont chargées
+	// - mois peut valoir "Tous", auquel cas toutes les notes de frais de l'année sont chargées
 	// -utilisateur peut valoir "Tous" (les notes de frais de tous les utilisateurs sont chargées) 
-	// ou null 'seul les notes de frais de l'utilisateur courant sont chargées)
+	// ou null (seules les notes de frais de l'utilisateur courant sont chargées)
 	this.getNoteDeFraisAnneeMoisUtilisateur = function(annee, mois, utilisateur) {
 		var current_user_id = RestApi.Identity.getCurrentUserId();
 		var result = [];
@@ -935,7 +935,7 @@ function BdmObject() {
 	}
 	
 	// renvoie la liste des notes de frais correspondant aux critères de recherche
-	// 'recherche' est une liste de triplet annee-mois-utilisateur
+	// 'recherche' est une liste de triplets annee-mois-utilisateur
 	// les notes renvoyées sont celles correspondant à au moins un des éléments de 'recherche'
 	this.getNoteDeFrais = function(recherche) {
 		function contientNoteDeFrais(tableau, ndf) {
@@ -992,8 +992,8 @@ RestApi.Bdm = new BdmObject();</pre>
 	</header>
 	
 	<p>
-	Le widget GoogleChart permet d'utiliser l'API Google Charts pour tracer des graphes. Seul une partie de l'API Google Charts 
-	est accessible via ce widget (seul trois types de graphes sont disponibles).
+	Le widget GoogleChart permet d'utiliser l'API Google Charts pour tracer des graphes. Seule une partie de l'API Google Charts 
+	est accessible via ce widget (seuls trois types de graphes sont disponibles).
 	</p>
 	
 	<p>
@@ -1027,12 +1027,12 @@ RestApi.Bdm = new BdmObject();</pre>
 	
 	<p>
 	Le processus se découpe en plusieurs activités qui seront détaillées ci-après. D'une manière globale, 
-	le processus se déroule comme suit : l'utilisateur créer une note de frais et peut soit la sauvegarder 
+	le processus se déroule comme suit : l'utilisateur crée une note de frais et peut soit la sauvegarder 
 	soit la soumettre pour validation ; tant que la note de frais n'est pas complète, l'utilisateur peut 
 	la modifier ; lorsque la note de frais passe à l'étape de validation, le validateur peut l'accepter ou 
-	la refuser ; si le validateur refuse la note de frais, l'utilisateur doit la complèter/modifier 
-	jusqu'à temps que les deux personnes soient d'accord ; une fois la note de frais validée, 
-	l'utilisateur clôt le processus en confirmant qu'il a bien reçut le montant indiqué.
+	la refuser ; si le validateur refuse la note de frais, l'utilisateur doit la compléter/modifier 
+	jusqu'à ce que les deux utilisateurs soient d'accord ; une fois la note de frais validée, 
+	l'utilisateur clôt le processus en confirmant qu'il a bien reçu le montant indiqué.
 	</p>
 	
 	</section>
@@ -1049,12 +1049,12 @@ RestApi.Bdm = new BdmObject();</pre>
 	<ul>
 		<li>Employé : réprésente l'employé pouvant déclarer une note de frais</li>
 		<li>Validateur : personne capable de valider une note de frais</li>
-		<li>Comptabilité : acteur fictif, les tâches réalisés par cet acteur sont automatiques</li>
+		<li>Comptabilité : acteur fictif, les tâches réalisées par cet acteur sont automatiques</li>
 	</ul>
 	<p>
-	<i>Remarque</i> : Pour le développement du processus, les acteurs ne seront pas définies et une même 
-	personne pourra à priori déclarer et valider une note de frais. Il est évident qu'une fois 
-	le processus mis en production, un tel comportement n'est pas envisageable. Ce sera à l'administateur 
+	<i>Remarque</i> : Pour le développement du processus, les acteurs ne seront pas définis et une même 
+	personne pourra à priori déclarer et valider des notes de frais. Une fois 
+	le processus mis en production, un tel comportement n'est pas envisageable. Il revient à l'administateur 
 	du portail Bonita BPM de définir les associations entre acteurs et utilisateurs.
 	</p>
 	</section>
@@ -1120,7 +1120,7 @@ RestApi.Bdm = new BdmObject();</pre>
 	<p>
 	Cette section décrit l'ensemble des activités du processus. Elle se décompose en quatres 
 	sous-parties: la création de la note de frais ; la modification d'une note de frais ; la validation 
-	d'une note de frais ; et la clôture du cas par l'utilisateur l'ayant démarré.
+	de la note de frais ; et la clôture du cas par l'utilisateur l'ayant démarré.
 	</p>
 	
 	<section id="proc.activites.creer">
@@ -1129,7 +1129,7 @@ RestApi.Bdm = new BdmObject();</pre>
 		</header>
 	
 	<p>
-	Cette activité permet de démarrer un cas du processus de gestion des notes de frais.
+	Cette activité permet de démarrer un cas de processus de gestion des notes de frais.
 	L'utilisateur peut y définir une note de frais et la soumettre à validation ou la sauvegarder 
 	pour la compléter plus tard.
 	</p>
@@ -1207,10 +1207,9 @@ RestApi.Bdm = new BdmObject();</pre>
 		
 		<p>
 		<i>Remarque 1</i> : les informations notées obligatoires pour la création des objets métiers et non 
-		présente dans le contrat sont calculés de manière programmatique ou ont des valeurs par défaut 
-		évidentes. Pour le champ <i>montant</i>, il est soit fournit via le formulaire, soit calculé 
-		à partir de <i>distance</i> et <i>coutKm</i> pour le type "KMS" ; il ne peut donc pas faire partie 
-		du contrat.
+		présentes dans le contrat sont calculées de manière programmatique ou ont des valeurs par défaut . 
+		Pour le champ <i>montant</i>, il est soit fourni via le formulaire, soit calculé à partir de 
+		<i>distance</i> et <i>coutKm</i> pour le type "KMS" ; il ne peut donc pas faire partie du contrat.
 		</p>
 		
 		<p>
@@ -1228,7 +1227,7 @@ RestApi.Bdm = new BdmObject();</pre>
 			</header>
 			
 		<p>
-		Cette section décrit le formulaire permettant d'instantier le processus. Un visuel puis une 
+		Cette section décrit le formulaire permettant d'instancier le processus. Un visuel puis une 
 		description plus détaillée sont fournis.
 		</p>
 		
@@ -1239,7 +1238,7 @@ RestApi.Bdm = new BdmObject();</pre>
 		Le formulaire permet à l'utilisateur d'entrer le mois comptable pour sa note de frais. Il 
 		permet également d'ajouter un nombre arbitraire d'élément à la note de frais. L'utilisateur 
 		doit préciser pour chaque élément de la note de frais la date et le montant ainsi que le type 
-		de la dépense. Il doit également préciser quelle affaire a entraîner la dépense et peut s'il le 
+		de la dépense. Il doit également préciser quelle affaire a entrainé la dépense et peut s'il le 
 		veut fournir une indication sur la preuve de la dépense. <br/>
 		L'utilisateur peut ajouter un nombre arbitraire de pièces jointes et peut entrer un commentaire 
 		avant soit de sauvegarder sa note de frais - auquel cas il pourra la modifier plus tard - soit 
@@ -1292,7 +1291,7 @@ return RestApi.Bdm.hasNoteDeFrais(RestApi.Identity.getCurrentUserId(),
 			
 		<p>
 		L'initialisation de la variable métier <i>note_de_frais</i> se fait avec un script Groovy. Les différents champs 
-		de l'objet métier <i>note_de_frais</i> sont remplis avec les valeurs fournit par le formulaire ou sont calculés 
+		de l'objet métier <i>note_de_frais</i> sont remplis avec les valeurs fournies par le formulaire ou sont calculés 
 		de manière programmatique.
 		</p>
 
@@ -1380,7 +1379,8 @@ return note_de_frais;</pre>
 	Dans le premier cas, l'ensemble des champs doit être éditable et l'utilisateur peut à nouveau 
 	sauvegarder sa note ou la soumettre. <br/>
 	Dans le second cas, les éléments de la note de frais déjà validés ne doivent plus être éditable mais 
-	doivent quand même apparaître, le commentaire du validateur doit apparaîte pour expliquer la raison du refus à l'utilisateur, le bouton de sauvegarde ne doit pas apparaître.
+	doivent quand même être visibles, le commentaire du validateur doit apparaître pour expliquer la raison 
+	du refus à l'utilisateur, et le bouton de sauvegarde ne doit pas apparaître.
 	</p>
 	
 		<section id="proc.activites.completer.acteur">
@@ -1388,7 +1388,7 @@ return note_de_frais;</pre>
 				<h3 class="num-section">3.4.2.1</h3><h3>Acteur</h3><span style="float:right"><a href="#proc.activites.completer.acteur"><h3>[proc.activites.completer.acteur]</h3></a></span>
 			</header>
 		
-		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seul la personne ayant démarré le cas 
+		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seule la personne ayant démarré le cas 
 		(i.e. la personne ayant déclaré la note de frais) peut effectuer cette tâche.</p>
 		
 		</section>
@@ -1530,7 +1530,7 @@ return note_de_frais;</pre>
 		<p>
 		Les boutons <i>Sauvegarder</i> et <i>Soumettre</i> ne sont activés que si les informations obligatoires 
 		ont toutes été fournies (variable <i>note_completee</i>). Pour que le bouton <i>Sauvegarder</i> soit 
-		actif, il faut également que la note n'est jamais été soumise à validation (i.e. le champ 
+		actif, il faut également que la note n'ait jamais été soumise à validation (i.e. le champ 
 		<i>estCompletee</i> de la note de frais vaut false).
 		</p>
 		
@@ -1588,7 +1588,7 @@ return true;</pre>
 		
 		<p>
 		La mise à jour de la note de frais se fait avec un script Groovy. Les nouveaux éléments de la note de frais sont 
-		ajoutés à la liste des anciens éléments. Les éléments supprimés qui faisaient partit de la liste des anciens 
+		ajoutés à la liste des anciens éléments. Les éléments supprimés qui faisaient partie de la liste des anciens 
 		éléments sont retirés. Les anciennes pièces jointes et les nouvelles sont regroupées dans la nouvelle liste des 
 		pièces jointes.
 		</p>
@@ -1714,7 +1714,7 @@ return resultat;</pre>
 		
 		<p>
 		<i>Remarque </i> : le code utilisé pour mettre à jour les pièces jointes utilise des fonctionnalités de Bonita 
-		peu documentée et il faudra peut-être faire quelque rechercher pour vérifier qu'il fonctionne bien.
+		peu documentées, quelques recherches nécessaires sont enviseageables pour s'assurer de son bon fonctionnement.
 		</p>
 			
 		</section>
@@ -1728,8 +1728,8 @@ return resultat;</pre>
 	
 	<p>
 	Dans cette activité, une personne est chargé de vérifier la note de frais et de la valider 
-	ou non. Dans le cas où la personne refuse, elle indiquera un commentaire permettant à 
-	la personne ayant déclarer sa note de savoir comment la modifier pour qu'elle soit acceptée.
+	ou non. Dans le cas où la personne refuse, elle entre un commentaire permettant à 
+	la personne ayant déclaré sa note de savoir comment la modifier pour qu'elle soit acceptée.
 	</p>
 	
 		<section id="proc.activites.valider.contrat">
@@ -1828,7 +1828,7 @@ return note_de_frais;</pre>
 	
 	<p>
 	Dans cette activité, la personne ayant déclaré la note de frais clôt le cas en confirmant avoir 
-	bien reçut le remboursement. Si elle n'a pas reçut le remboursement elle peut quitter la page en fermant 
+	bien reçu le remboursement. Dans le cas contraire, elle peut quitter la page en fermant 
 	l'onglet de son navigateur ou cliquer sur le bouton <i>Je n'ai pas encore été remboursé</i>.
 	</p>
 	
@@ -1837,7 +1837,7 @@ return note_de_frais;</pre>
 				<h3 class="num-section">3.4.4.1</h3><h3>Acteur</h3><span style="float:right"><a href="#proc.activites.confirmer.acteur"><h3>[proc.activites.confirmer.acteur]</h3></a></span>
 			</header>
 		
-		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seul la personne ayant démarré le cas 
+		<p>Pour cette activité, le filtre <i>Initiateur</i> est défini pour l'acteur. Cela signifie que seule la personne ayant démarré le cas 
 		(i.e. la personne ayant déclaré la note de frais) peut effectuer cette tâche.</p>
 		
 		</section>
@@ -1848,7 +1848,7 @@ return note_de_frais;</pre>
 			</header>
 		
 		<p>
-		Le contrat est constitué d'une unique variable indiquant si l'utilisateur à bien été remboursé.
+		Le contrat est constitué d'une unique variable indiquant si l'utilisateur a bien été remboursé.
 		</p>
 		
 		<table class="contrat">
@@ -1875,9 +1875,9 @@ return note_de_frais;</pre>
 			
 		<p>
 		Le formulaire affiche l'ensemble des informations concernant la note de frais à l'utilisateur 
-		et un simple bouton lui demande de confirmer s'il a bien reçut le montant total indiqué. En 
+		et un simple bouton lui demande de confirmer s'il a bien reçu le montant total indiqué. En 
 		cliquant sur le bouton, l'utilisateur clôt le cas. En cas de problème, il doit contacter 
-		un responsable quelconque et une fois le problème régler appuyer sur le bouton.
+		un responsable quelconque et une fois le problème réglé, appuyer sur le bouton.
 		</p>
 		
 		<img src="form_confirmer.png" alt="Image du formulaire introuvable" title="Image du formulaire de confirmation" width="700px"/>
@@ -1937,7 +1937,7 @@ return montant;</pre>
 	</header>
 	
 	<p>
-	Cette section décrit les applications fournit en parallèle du processus outillé dans <i>Bonita</i>. 
+	Cette section décrit les applications fournies en parallèle du processus outillé dans <i>Bonita</i>. 
 	Deux applications sont proposées : la première permet à un utilisateur de consulter l'ensemble de 
 	ses notes de frais ; la seconde permet à un administrateur de consulter l'ensemble des notes 
 	de frais des utilisateurs. <br/> 
@@ -1963,8 +1963,8 @@ return montant;</pre>
 		<img src="ui-designer-page-mes-notes.png" width="700px" alt="Image application introuvable" title="UI-Designer | Page - Mes notes de frais"/>
 
 		<p>
-		Dans la première partie de la page, l'utilisateur est amenée à définir un ou plusieurs critères de recherche. 
-		Un critère de recherche est définie par une année et éventuellement un mois. Seules les notes répondant à un critère 
+		Dans la première partie de la page, l'utilisateur est amené à définir un ou plusieurs critères de recherche. 
+		Un critère de recherche est défini par une année et éventuellement un mois. Seules les notes répondant à un critère 
 		sont affichées.
 		</p>
 		
@@ -1993,7 +1993,7 @@ return montant;</pre>
 		</p>
 		
 		<p>
-		Le montant des dépenses par catégories est calculé et affiché. L'utilisateur peut filtrer 
+		Le montant des dépenses par catégorie est calculé et affiché. L'utilisateur peut filtrer 
 		d'avantage l'ensemble des notes sur lequel les calculs sont effectués en sélectionnant une 
 		affaire dans la liste déroulante.
 		</p>
@@ -2019,13 +2019,13 @@ return montant;</pre>
 		<img src="apps-gestion.png" width="700px" alt="Image application introuvable" title="Page - Gestion des notes de frais"/>
 		
 		<p>
-		L'application fonctionne de la même manière que celle fournit pour l'utilisateur à la différence 
+		L'application fonctionne de la même manière que celle fournie pour l'utilisateur à la différence 
 		que l'administrateur peut filtrer les résultats selon une année, un mois et un utilisateur. 
-		Le nom de l'utilisateur ayant déclarée la note est également affiché dans le tableau.
+		Le nom de l'utilisateur ayant déclaré la note est également affiché dans le tableau.
 		</p>
 		
 		<p>
-		Voici un aperçut de sa mise en place dans le UI-Designer
+		Voici un aperçu de sa mise en place dans le UI-Designer
 		</p>
 		
 		<img src="ui-designer-page-gestion-notes.png" width="700px" alt="Image application introuvable" title="UI-Designer Page - Gestion des notes de frais"/>
