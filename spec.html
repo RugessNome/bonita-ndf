@@ -1261,7 +1261,8 @@ RestApi.Bdm = new BdmObject();</pre>
 		Pour l'ensemble de ces widgets, le libellé est masqué.
 		La mention indiquant qu'une note de frais existe déjà est masqué et les boutons permettant de valider 
 		le formulaire sont activés s'il n'existe pas de note de frais pour le mois sélectionné (variable 
-		<i>note_de_frais_existante</i>).
+		<i>note_de_frais_existante</i>). Les boutons sont désactivés si les informations saisies sont 
+		invalides (e.g. montant non positifs, date ne correspondant pas au mois comptable de la note, etc...).
 		</p>
 		
 		<div class="code-fragment">
@@ -1281,6 +1282,103 @@ return RestApi.Bdm.hasNoteDeFrais(RestApi.Identity.getCurrentUserId(),
 		</div>
 		</div>
 		
+		<p>
+		La variable <i>info_note_de_frais</i> contient des informations sur la note de frais et 
+		ses éléments. Elle indique si les éléments de la note de frais sont valides et contient 
+		les messages d'erreur à afficher en cas de problème.
+		</p>
+		
+		<div class="code-fragment">
+		<div class="nom">info_note_de_frais</div>
+		<div class="description">Javascript expression</div>
+		<div class="valeur">
+		<input type="checkbox" id="form-creer-var-info_note_de_frais" />
+		<label for="form-creer-var-info_note_de_frais">Afficher / Masquer le code</label>
+		<div class="code">
+		<pre>
+if(!angular.isDefined($data.formInput.input_note_de_frais)) {
+    return 0;
+}
+
+
+function indexMois(m) {
+    var liste_mois = ["Janvier", "Fevrier", "Mars", "Avril",
+                       "Mai", "Juin", "Juillet", "Aout", "Septembre",
+                       "Octobre", "Novembre", "Decembre"];
+    return liste_mois.indexOf(m);
+}
+
+var ndf = $data.formInput.input_note_de_frais;
+
+var montant = 0;
+var elems = [];
+var ndf_ok = true;
+
+for(var i = 0; i &lt; ndf.elements.length; i++) {
+    var e = ndf.elements[i];
+    montant += e.montant;
+    
+    var e_ok = true;
+    var e_err = "";
+    
+    if(e.type == null) {
+        e_ok = false;
+        e_err += "Vous devez spécifier un type pour cet élément.&lt;br/>";
+    } else {
+        if(e.type == "KMS") {
+            if(e.distance == null) {
+                e_ok = false;
+                e_err += "Vous devez spécifier une distance pour cet élément.&lt;br/>";
+            } else if(e.distance == 0) {
+                e_ok = false;
+                e_err += "Vous devez spécifier une distance strictement positive pour cet élément.&lt;br/>";
+            }
+            if(e.coutKm == null) {
+                e_ok = false;
+                e_err += "Vous devez spécifier un coût au kilomètre pour cet élément.&lt;br/>";
+            } else if(e.coutKm == 0) {
+                e_ok = false;
+                e_err += "Vous devez spécifier un coût au kilomètre strictement positif pour cet élément.&lt;br/>";
+            }
+        } else {
+            if(e.montant == null) {
+                e_ok = false;
+                e_err += "Vous devez spécifier un montant pour cet élément.&lt;br/>";
+            } else if(e.montant == 0) {
+                e_ok = false;
+                e_err += "Vous devez spécifier un montant strictement positif pour cet élément.&lt;br/>";
+            }
+        }
+    }
+
+    if(e.dateDepense == null) {
+        e_ok = false;
+        e_err += "Vous devez spécifier une date pour cet élément.&lt;br/>";
+    } else {
+        if(e.dateDepense.getMonth() != indexMois(ndf.moisComptable)) {
+            e_ok = false;
+            e_err += "Le mois spécifié pour cet élément ne correspond pas au mois de la note de frais.&lt;br/>";
+        }
+        if(e.dateDepense.getFullYear() != ndf.anneeComptable) {
+            e_ok = false;
+            e_err += "L'année spécifiée pour cet élément ne correspond pas à celle de la note de frais.&lt;br/>";
+        }   
+    }
+    
+    if(e.affaire == null) {
+        e_ok = false;
+        e_err += "Vous devez spécifier une affaire pour cet élément.&lt;br/>";
+    }
+    
+    ndf_ok = ndf_ok &amp; e_ok;
+    elems.push({"ok": e_ok, "erreur": e_err});
+}
+
+
+return {"ok": ndf_ok, "montant": montant, "elements": elems};</pre>
+		</div>
+		</div>
+		</div>
 		
 		</section>
 		
@@ -1529,50 +1627,10 @@ return note_de_frais;</pre>
 		
 		<p>
 		Les boutons <i>Sauvegarder</i> et <i>Soumettre</i> ne sont activés que si les informations obligatoires 
-		ont toutes été fournies (variable <i>note_completee</i>). Pour que le bouton <i>Sauvegarder</i> soit 
+		ont toutes été fournies et sont valides (variable <i>info_note_de_frais</i> similaire au premier formulaire). Pour que le bouton <i>Sauvegarder</i> soit 
 		actif, il faut également que la note n'ait jamais été soumise à validation (i.e. le champ 
 		<i>estCompletee</i> de la note de frais vaut false).
 		</p>
-		
-		<div class="code-fragment">
-		<div class="nom">note_completee</div>
-		<div class="description">Javascript expression</div>
-		<div class="valeur">
-		<input type="checkbox" id="form-completer-var-note_completee" />
-		<label for="form-completer-var-note_completee">Afficher / Masquer le code</label>
-		<div class="code">
-		<pre>
-var elems = $data.noteDeFrais.elements;
-for(var i = 0; i &lt; elems.length; i++) {
-    var e = elems[i];
-    
-    if(e == null) {
-        return false;
-    }
-    
-    if(e.type == null) {
-        return false;
-    }
-    
-    if(e.type == "KMS") {
-        if(e.coutKm == null || e.distance == null) {
-            return false;
-        }
-    } else {
-        if(e.montant == null) {
-            return false;
-        }
-    }
-    
-    if(e.dateDepense == null || e.affaire == null) {
-        return false;
-    }
-}
-
-return true;</pre>
-		</div>
-		</div>
-		</div>
 		
 		</section>
 		
@@ -1691,10 +1749,7 @@ List&lt;FileInputValue> filesInputValue = new ArrayList&lt;FileInputValue>();
 
 while((documents = apiAccessor.processAPI.getDocumentList(processInstanceId, "pieces_jointes", index, numberOfResult)).size()) {
 	for(Document currentDocument : documents) {
-		FileInputValue fileInputValue = new FileInputValue(
-		currentDocument.contentFileName, 
-		apiAccessor.processAPI.getDocumentContent(currentDocument.contentStorageId)
-		);
+		FileInputValue fileInputValue = new FileInputValue(currentDocument.contentFileName, apiAccessor.processAPI.getDocumentContent(currentDocument.contentStorageId));
 		
 		filesInputValue.add(fileInputValue);
 	}
@@ -1703,8 +1758,9 @@ while((documents = apiAccessor.processAPI.getDocumentList(processInstanceId, "pi
 
 List&lt;Object> resultat = new ArrayList&lt;Object>();
 resultat.addAll(filesInputValue);
-resultat.addAll(form_pieces_jointes);
-
+if(form_pieces_jointes != null) {
+	resultat.addAll(form_pieces_jointes);
+}
 
 return resultat;</pre>
 		</div>
